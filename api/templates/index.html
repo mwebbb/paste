@@ -10,7 +10,9 @@ def create_paste(text):
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return "if this works i kill myself"
+#    return render_template('index.html')
+    
 
 @app.route('/submit', methods=['POST'])
 def submit():
