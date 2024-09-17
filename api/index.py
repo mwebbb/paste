@@ -1,11 +1,21 @@
 from flask import Flask, request, render_template
-import random 
-
+import random
+import string
 
 app = Flask(__name__)
 
 def create_paste(text):
-    return hi
+    filename = ''.join(random.choice(string.ascii + string.digits) for _ in range(5))
+
+    file = open(f"/pastes/{filename}", "x")
+    file.write(text)
+    return filename
+
+    
+@app.route('paste')
+def paste():
+    file_name = request.args.get('id')
+    return open(file_name)
     
 
 
@@ -18,7 +28,7 @@ def submit():
     text = request.form.get('text')
     
     
-    return f"Paste submitted"
+    return f"Paste submitted\nUrl: https://paste2-three.vercel.app/paste?{create_paste(text)}"
 
 
 if __name__ == '__main__':
