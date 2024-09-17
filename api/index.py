@@ -5,7 +5,7 @@ import string
 app = Flask(__name__)
 
 def create_paste(text):
-    filename = ''.join(random.choice(string.ascii + string.digits) for _ in range(5))
+    filename = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
 
     file = open(f"/pastes/{filename}", "x")
     file.write(text)
