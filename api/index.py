@@ -12,7 +12,7 @@ def create_paste(text):
     return filename
 
     
-@app.route('paste')
+@app.route('/paste')
 def paste():
     file_name = request.args.get('id')
     return open(file_name)
