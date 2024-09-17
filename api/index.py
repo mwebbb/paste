@@ -15,13 +15,13 @@ def create_paste(text):
 @app.route('/paste')
 def paste():
     file_name = request.args.get('id')
-    return open(file_name)
-    
+    return str(open(file_name, "r"))
 
 
 @app.route('/')
 def home():
     return render_template('index.html')
+
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -33,4 +33,3 @@ def submit():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
