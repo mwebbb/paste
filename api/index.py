@@ -1,11 +1,26 @@
-from flask import Flask
+from flask import Flask, request, render_template
+import random 
+
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return 'Hello, World!'
+def create_paste(text):
+    return hi
+    
 
-@app.route('/about')
-def about():
-    return 'About'
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    text = request.form.get('text')
+    
+    
+    return f"Paste submitted"
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
