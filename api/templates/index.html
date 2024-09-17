@@ -1,27 +1,27 @@
-from flask import Flask, request, render_template
-import random 
-
-
-app = Flask(__name__)
-
-def create_paste(text):
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pastebin 2</title>
+  </head>
+  <body>
+    <h3>paste</h3>
+      <form action="/submit" method="post">
+          <input id="filename" placeholder="filename"></input>
+    <br></br>
+          <textarea placeholder="enter paste here..." size=50% type="text" id="text" name="text" required></textarea>	
+          <br>
+          <button type="submit">Submit</button>
+      </form>
+  </body>
+  
+  <style>
+  
+  textarea {
+    width: 100%;
+    height: 90%;
+    font-family: monospace
     
-
-
-@app.route('/')
-def home():
-    return "if this works i kill myself"
-#    return render_template('index.html')
-    
-
-@app.route('/submit', methods=['POST'])
-def submit():
-    text = request.form.get('text')
-    
-    
-    return f"Paste submitted"
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
+  }
+  
+  </style>
+  
