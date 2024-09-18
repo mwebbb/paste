@@ -25,12 +25,32 @@ def create_paste(text):
 
 
     
+# @app.route('/paste')
+# def paste():
+#     file_name = request.args.get('id')
+#     response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
+#     content = response['Body'].read().decode('utf-8')
+#     return content
+
+
 @app.route('/paste')
 def paste():
     file_name = request.args.get('id')
-    response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
-    content = response['Body'].read().decode('utf-8')
-    return content
+    
+    if not file_name:
+        return "Error: No file name provided", 400
+    
+    try:
+        response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
+        content = response['Body'].read().decode('utf-8')
+        
+        # Return content in HTML with monospace font
+        return f"<pre style='font-family: monospace;'>{content}</pre>"
+    except s3.exceptions.NoSuchKey:
+        return "Error: Paste not found", 404
+    except Exception as e:
+        return f"Error: {str(e)}", 500
+
 
 
 @app.route('/')
@@ -43,7 +63,7 @@ def submit():
     text = request.form.get('text')
     
     
-    return f"Paste submitted\nUrl: https://paste2-three.vercel.app/paste?{create_paste(text)}"
+    return f"Success! View your paste <a href="https://paste2-three.vercel.app/paste?id={create_paste(text)}">here!</a>"
 
 
 if __name__ == '__main__':
