@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 import random
 import string
 import boto3
@@ -55,7 +55,7 @@ def submit():
     text = request.form.get('text')
     
     
-    return f"Success! View your paste <a href=\"https://paste.de1ta.lol/paste?id={create_paste(text)}\">here!</a>"
+    redirect(f"/paste?id={create_paste(text)}")
 
 @app.errorhandler(413)
 def request_entity_too_large(error):
