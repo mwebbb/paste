@@ -63,7 +63,7 @@ def submit():
     text = request.form.get('text')
     
     
-    return f"Success! View your paste <a href="https://paste2-three.vercel.app/paste?id={create_paste(text)}">here!</a>"
+    return f"Success! View your paste <a href=\"https://paste2-three.vercel.app/paste?id={create_paste(text)}\">here!</a>"
 
 
 if __name__ == '__main__':
