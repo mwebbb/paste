@@ -20,8 +20,6 @@ app = Flask(__name__)
 def create_paste(text):
     filename = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
 
-    file = open(f"/pastes/{filename}", "w")
-    file.write(text)
     s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=text)
     return filename
 
