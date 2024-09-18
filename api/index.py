@@ -20,7 +20,7 @@ app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 
 
 def create_paste(text):
-    filename = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
+    filename = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(6))
 
     s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=text)
     return filename
