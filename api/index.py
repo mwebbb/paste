@@ -54,8 +54,8 @@ def home():
 def submit():
     text = request.form.get('text')
     
-    return "redirecting to paste..."
-    redirect(f"/paste?id={create_paste(text)}")
+    return redirect(f"/paste?id={create_paste(text)}")
+    
 
 @app.errorhandler(413)
 def request_entity_too_large(error):
