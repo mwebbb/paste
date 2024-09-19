@@ -50,7 +50,7 @@ def login():
     if request.method == "GET":
         return render_template('login.html')
     elif request.method == "POST":
-        pw = request.form['key']
+        pw = request.form.get('key')
         if pw == key:
             resp = make_response(redirect('/dashboard'))
             resp.set_cookie('key', pw)
