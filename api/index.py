@@ -12,6 +12,8 @@ s3 = boto3.client(
     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
 )
 
+key = os.getenv('KEY')
+
 BUCKET_NAME = os.getenv('AWS_S3_BUCKET_NAME')
 
 
@@ -43,6 +45,26 @@ def paste():
     except Exception as e:
         return f"Error: {str(e)}", 500
 
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template('login.html')
+    elif request.method == "POST":
+        pw = request.form['key']
+        if pw == key:
+            resp = make_response(redirect('/dashboard'))
+            resp.set_cookie('key', pw)
+
+            return resp
+        
+    
+@app.route('/dashboard')
+def dashboard():
+    cookie = request.cookies.get('key')
+    if cookie == key:
+        return render_template('dashboard.html')
+    else:
+        return "wrong key"
 
 
 @app.route('/')
