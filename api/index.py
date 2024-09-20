@@ -79,13 +79,15 @@ def dashboard():
         return "wrong key"
 
 
-@app.route('/delete', methods=["GET", "POST"])
+@app.route('/delete', methods=["POST"])
 def delete():
     if request.method == "POST":
         cookie = request.cookies.get('key')
         if cookie == key:
-            file = s3.get_object(Bucket=BUCKET_NAME, Key=request.form.get('file'))
+            file = s3.get_object(Bucket=BUCKET_NAME, Key=request.form.get('toDelete'))
             file.delete()
+        else:
+            return "you are not logged in"
 
 
 
