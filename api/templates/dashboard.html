@@ -25,7 +25,7 @@
         <tbody>
             {% for file in files %}
             <tr>
-                <td>{{ file['Key'] }}</td>
+                <td><a href="{{ url_for('paste', id=file['Key']) }}"></a></td>
                 <td>{{ file['Size'] }}</td>
             </tr>
             {% endfor %}
