@@ -79,7 +79,7 @@ def dashboard():
         return "wrong key"
 
 
-@app.route('/delete' methods=["GET", "POST"])
+@app.route('/delete', methods=["GET", "POST"])
 def delete():
     if request.method == "POST":
         cookie = request.cookies.get('key')
