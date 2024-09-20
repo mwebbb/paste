@@ -30,7 +30,7 @@ input:hover {
 body {
     background-color: black;
     color: white;
-    font-family: mono;
+    font-family: mono, monospace;
     text-align: center;
     padding-top: 15%;
 
@@ -43,7 +43,6 @@ body {
     margin: 0;
     padding: 0;
     color: white;
-    font-family: mono;
     font-size: 1rem;
     cursor: pointer;
 
@@ -58,8 +57,14 @@ body {
 
 textarea:focus {
 
-    border-color: black;
+    border-color: transparent;
     outline: none !important
+}
+
+textarea {
+    border-color: transparent;
+    height: 90%;
+    width: 100%;
 }
 
 table {
@@ -74,4 +79,8 @@ a {
 a:hover {
     color: white;
     
+}
+
+button {
+    cursor: pointer;
 }
