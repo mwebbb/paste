@@ -11,26 +11,28 @@
     <title>/dashboard</title>
 </head>
 
-<h3>file list</h3>
-<br>
-<table>
-    <thead>
-        <tr>
-            <th>File Name</th>
-            <th>Size (Bytes)</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for file in files %}
-        <tr>
-            <td>{{ file['Key'] }}</td>
-            <td>{{ file['Size'] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div>
 
+    <h3>file list</h3>
 
+    <table>
+        <thead>
+            <tr>
+                <th>File Name</th>
+                <th>Size (Bytes)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for file in files %}
+            <tr>
+                <td>{{ file['Key'] }}</td>
+                <td>{{ file['Size'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
 
 
 <style>
@@ -42,7 +44,7 @@
         border-width: 1px;
         border-radius: 12px;
         border-color: whitesmoke;
-        font-size: 10px;
+        font-size: 12px;
 
     }
 
@@ -93,6 +95,7 @@
         align-items: center;
         margin: 0;
         justify-content: center;
+        position: relative;
 
 
 
