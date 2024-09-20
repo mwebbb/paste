@@ -17,6 +17,15 @@ key = os.getenv('KEY')
 BUCKET_NAME = os.getenv('AWS_S3_BUCKET_NAME')
 
 
+def listFiles():
+    try:
+        response = s3.list_objects_v2(Bucket=BUCKET_NAME)
+        files = response.get('Contents', [])
+        return files
+    except NoCredentialsError:
+        return []
+
+
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 
 
@@ -56,15 +65,30 @@ def login():
             resp.set_cookie('key', pw)
 
             return resp
-        
+        elif pw != key:
+            redirect("/login", error = "invalid key")
+
     
 @app.route('/dashboard')
 def dashboard():
     cookie = request.cookies.get('key')
     if cookie == key:
-        return render_template('dashboard.html')
+        showFiles = listFiles()
+        return render_template('dashboard.html', files=showFiles)
     else:
         return "wrong key"
+
+
+@app.route('/delete' methods=["GET", "POST"])
+def delete():
+    if request.method == "POST":
+        cookie = request.cookies.get('key')
+        if cookie == key:
+            file = s3.get_object(Bucket=BUCKET_NAME, Key=request.form.get('file'))
+            file.delete()
+
+
+
 
 
 @app.route('/')
