@@ -5,31 +5,33 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 </head>
-<div>
 
-    <h3>file list</h3>
+<body class="altStyle">
     <div>
-        <form action="/delete" method="POST">
-            <input type="text" name="toDelete" placeholder="file name..."></input>
-            <button type="submit">delete</button>
-        </form>
+        <h3>file list</h3>
+        <div>
+            <form action="/delete" method="POST">
+                <input type="text" name="toDelete" placeholder="file name..."></input>
+                <button type="submit">delete</button>
+            </form>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Size (Bytes)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in files %}
+                <tr>
+                    <td><a href="{{ url_for('paste', id=file['Key']) }}">{{ file['Key'] }}</a></td>
+                    <td>{{ file['Size'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
     </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>File Name</th>
-                <th>Size (Bytes)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for file in files %}
-            <tr>
-                <td><a href="{{ url_for('paste', id=file['Key']) }}">{{ file['Key'] }}</a></td>
-                <td>{{ file['Size'] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-</div>
+</body>

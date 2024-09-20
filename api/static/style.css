@@ -27,7 +27,7 @@ input:hover {
 }
 
 
-body {
+.alt {
     background-color: black;
     color: white;
     font-family: mono, monospace;
@@ -65,6 +65,7 @@ textarea {
     border-color: transparent;
     height: 90%;
     width: 100%;
+    background-color: black;
 }
 
 table {
