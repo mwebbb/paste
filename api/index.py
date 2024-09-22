@@ -45,7 +45,7 @@ def create_paste(text):
     return filename
 
 
-@app.route('/paste')
+@app.route('/v')
 def paste():
     file_name = request.args.get('id')
     
@@ -121,7 +121,7 @@ def home():
 def submit():
     text = request.form.get('text')
     
-    return redirect(f"/paste?id={create_paste(text)}")
+    return redirect(f"/v?id={create_paste(text)}")
     
 
 @app.errorhandler(413)
