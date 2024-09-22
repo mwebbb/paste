@@ -70,11 +70,14 @@ table {
     margin-left: auto;
     margin-right: auto;
     border-collapse: collapse;
+    border-color: white;
+    border-radius: 10px;
+
 }
 th, td {
-    border: whitesmoke;
+    border: white;
     padding: 8px;
-    text-align: left;
+    text-align: center;
 }
 th {
     background-color: transparent;
