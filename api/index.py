@@ -65,7 +65,7 @@ def login():
             resp.set_cookie('key', pw)
 
             return resp
-        elif pw != key:
+        else:
             redirect("/login", error = "invalid key")
 
     
