@@ -4,6 +4,7 @@ import string
 import boto3
 import os
 from botocore.exceptions import NoCredentialsError
+import html
 
 
 s3 = boto3.client(
@@ -16,6 +17,13 @@ key = os.getenv('KEY')
 
 BUCKET_NAME = os.getenv('AWS_S3_BUCKET_NAME')
 
+def renameObject(old, new):
+    
+    s3.copy_object(
+        Bucket=BUCKET_NAME,
+        CopySource={'Bucket': BUCKET_NAME, 'Key': old},
+        Key=new
+    )
 
 def listFiles():
     try:
@@ -27,7 +35,7 @@ def listFiles():
 
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 
+app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 
 
 
 def create_paste(text):
@@ -47,8 +55,8 @@ def paste():
     try:
         response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
         content = response['Body'].read().decode('utf-8')
-        
-        return f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 90%; '>{content}</pre>"
+        processed_content = html.escape(content)
+        return f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 90%; '>{processed_content}</pre>"
     except s3.exceptions.NoSuchKey:
         return "Error: Paste not found", 404
     except Exception as e:
@@ -91,7 +99,17 @@ def delete():
             return "you are not logged in"
 
 
-
+@app.route('/rename', methods=["POST"])
+def rename():
+    cookie = request.cookies.get('key')
+    if cookie == key:
+        oldKey = request.form.get('oldKey')
+        newKey = request.form.get('newKey')
+        renameObject(oldKey, newKey)
+        return redirect('/dashboard')
+    else:
+        return 'incorrect credentials'
+    
 
 
 @app.route('/')
