@@ -15,23 +15,23 @@
                 <button type="submit">delete</button>
             </form>
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>File Name</th>
-                    <th>Size (Bytes)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for file in files %}
-                <tr>
-                    <td><a href="{{ url_for('paste', id=file['Key']) }}">{{ file['Key'] }}</a></td>
-                    <td>{{ file['Size'] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
+        <div id="files">
+            <table>
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Size (Bytes)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in files %}
+                    <tr>
+                        <td><a href="{{ url_for('paste', id=file['Key']) }}">{{ file['Key'] }}</a></td>
+                        <td>{{ file['Size'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
