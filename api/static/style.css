@@ -76,7 +76,7 @@ table {
 }
 
 th, td, tr {
-    border: #111111;
+    border: 1px #111111;
     padding: 8px;
     text-align: center;
 }
