@@ -27,10 +27,11 @@
                 <tbody>
                     {% for file in files %}
                     <tr>
-                        <td><a href="{{ url_for('paste', id=file['Key']) }}" target="_blank">{{ file['Key'] }}</a>></td>
+                        <td><a href="{{ url_for('paste', id=file['Key']) }}" target="_blank">{{ file['Key'] }}</a></td>
                         <td>{{ file['Size'] }}</td>
                         <td>
-                            <form class="delete-form" data-file="{{ file['Key'] }}">
+                            <form action="/delete" method="POST">
+                                <input type="hidden" name="toDelete" value="{{ file['Key'] }}">
                                 <button type="submit">delete</button>
                             </form>
                         </td>
