@@ -67,16 +67,18 @@ textarea {
 }
 
 table {
-    position: fixed;
-    inset: 0px;
-    width: 12rem;
-    height: 5rem;
-    max-width: 100vw;
-    max-height: 100dvh;
-    margin: auto;
-    border-color: whitesmoke;
-  }
-
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+}
+th, td {
+    border: whitesmoke;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: transparent;
+}
 a {
     color: white;
 }
