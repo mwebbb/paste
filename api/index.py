@@ -48,7 +48,7 @@ def paste():
         response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
         content = response['Body'].read().decode('utf-8')
         
-        return f"<pre style='font-family: mono; text-wrap: wrap; font-size: 90%; '>{content}</pre>"
+        return f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 90%; '>{content}</pre>"
     except s3.exceptions.NoSuchKey:
         return "Error: Paste not found", 404
     except Exception as e:

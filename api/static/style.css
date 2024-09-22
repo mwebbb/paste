@@ -74,7 +74,7 @@ table {
     border-radius: 10px;
 
 }
-th, td {
+th, td, tr {
     border: white;
     padding: 8px;
     text-align: center;

@@ -19,15 +19,21 @@
             <table>
                 <thead>
                     <tr>
-                        <th>File Name</th>
-                        <th>Size (Bytes)</th>
+                        <th>file name</th>
+                        <th>size (bytes)</th>
+                        <th>delete</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for file in files %}
                     <tr>
-                        <td><a href="{{ url_for('paste', id=file['Key']) }}">{{ file['Key'] }}</a></td>
+                        <td><a href="{{ url_for('paste', id=file['Key']) }}" target="_blank">{{ file['Key'] }}</a>></td>
                         <td>{{ file['Size'] }}</td>
+                        <td>
+                            <form class="delete-form" data-file="{{ file['Key'] }}">
+                                <button type="submit">delete</button>
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
