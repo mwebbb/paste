@@ -86,6 +86,7 @@ def delete():
         if cookie == key:
             file = request.form.get('toDelete')
             s3.delete_object(Bucket=BUCKET_NAME, Key=file)
+            return redirect('/dashboard')
         else:
             return "you are not logged in"
 
