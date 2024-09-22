@@ -66,7 +66,7 @@ def login():
 
             return resp
         else:
-            redirect(render_template("login.html", error = "invalid key"))
+            return render_template("login.html", error = "invalid key")
 
     
 @app.route('/dashboard')
