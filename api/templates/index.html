@@ -7,9 +7,9 @@
 
 <body>
   <form action="/submit" method="post">
-    <h3 class="title">de1tabin <button class="submit" type="submit"><strong>[create]</strong></button></h3>
-    <textarea placeholder="enter paste here..." size=50% type="text" id="text" name="text" required></textarea>
-    <br>
+    <h3 class="title">de1tabin</h3>
+    <textarea placeholder="enter paste here..." type="text" id="text" name="text" required></textarea>
+    <h3><button id="createButton" class="submit" type="submit"><strong>[create]</strong></button></h3>
 
   </form>
 </body>
@@ -18,10 +18,13 @@
   body {
     background-color: black;
     color: white;
-    font-family: mono;
+    font-family: inter;
     padding-left: 1%;
     text-align: left;
-    
+    font-size: 20px;
+  }
 
+  .submit, strong {
+    font-size: 15px;
   }
 </style>

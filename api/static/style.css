@@ -1,6 +1,7 @@
 h3 {
     font-size: 20px;
     padding-bottom: 8px;
+    font-family: mono, monospace
 }
 
 button,
@@ -11,7 +12,7 @@ input {
     border: 1px solid #8f8f8f;
     display: inline-block;
     color: #ffffff;
-    font-family: Courier New;
+    font-family: mono, monospace;
     font-size: 12px;
     padding: 9px 14px;
     text-decoration: none;
@@ -27,7 +28,7 @@ input:hover {
 }
 
 
-.alt {
+.altStyle {
     background-color: black;
     color: white;
     font-family: mono, monospace;
@@ -36,36 +37,33 @@ input:hover {
 
 }
 
-.submit {
-
-    background: none;
-    border: none;
-    margin: 0;
-    padding: 0;
-    color: white;
-    font-size: 1rem;
-    cursor: pointer;
-
-}
-
-
 .title {
 
-    padding-top: 5px;
+    padding-top: 15px;
 
 }
 
 textarea:focus {
 
-    border-color: transparent;
-    outline: none !important
+    border-color: white;
+    outline: white;
+}
+
+textarea:hover {
+    border-color: white;
+
 }
 
 textarea {
-    border-color: transparent;
-    height: 90%;
-    width: 100%;
+    border-color: #8f8f8f;
+    height: 80%;
+    width: 98%;
     background-color: black;
+    color: white;
+    font-size: 16px;
+    transition-duration: 200ms;
+    border-radius: 10px;
+    padding: 15px;
 }
 
 table {
@@ -79,9 +77,9 @@ a {
 
 a:hover {
     color: white;
-    
 }
 
 button {
     cursor: pointer;
+    font-size: 10px;
 }
