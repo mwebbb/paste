@@ -62,7 +62,7 @@ def paste():
         processed_content = html.escape(content)
         return f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px; '>{processed_content}</pre>"
     except s3.exceptions.NoSuchKey:
-        return "Error: Paste not found", 404
+        return "<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px; '>Error: Paste not found</pre>", 404
     except Exception as e:
         return f"Error: {str(e)}", 500
 
