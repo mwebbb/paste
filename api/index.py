@@ -51,10 +51,6 @@ def create_paste(text):
 @app.route('/edit', methods=["GET", "POST"])
 def edit():
 
-        file_name = request.args.get('id')
-
-        if not file_name:
-            return "No file id provided!"
         cookie = request.cookies.get("key")
         if cookie == key:
 
@@ -68,6 +64,10 @@ def edit():
                 return redirect(f"/v?id={file_name}")
             
             elif request.method == "GET":
+                file_name = request.args.get('id')
+
+                if not file_name:
+                    return "No file id provided!"
 
                 response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
                 content = html.escape(response['Body'].read().decode('utf-8'))
