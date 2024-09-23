@@ -70,29 +70,29 @@ def paste():
     except Exception as e:
         return f"Error: {str(e)}", 500
 
-@app.route('/login', methods=["GET", "POST"])
-def login():
+@app.route('/auth', methods=["GET", "POST"])
+def auth():
     if request.method == "GET":
-        return render_template('login.html')
+        return render_template('auth.html')
     elif request.method == "POST":
         pw = request.form.get('key')
         if pw == key:
-            resp = make_response(redirect('/dashboard'))
+            resp = make_response(redirect('/panel'))
             resp.set_cookie('key', pw)
 
             return resp
         else:
-            return render_template("login.html", error = "invalid key")
+            return render_template("auth.html", error = "Incorrect key.")
 
     
-@app.route('/dashboard')
-def dashboard():
+@app.route('/panel')
+def panel():
     cookie = request.cookies.get('key')
     if cookie == key:
         showFiles = listFiles()
-        return render_template('dashboard.html', files=showFiles)
+        return render_template('panel.html', files=showFiles)
     else:
-        return "wrong key"
+        return redirect("auth.html", error = "Incorrect key.")
 
 
 @app.route('/delete', methods=["POST"])
@@ -102,18 +102,18 @@ def delete():
         if cookie == key:
             file = request.form.get('toDelete')
             s3.delete_object(Bucket=BUCKET_NAME, Key=file)
-            return redirect('/dashboard')
+            return redirect('/panel')
         else:
-            return "you are not logged in"
+            return redirect("auth.html", error = "Incorrect key.")
 
-@app.route('/modal')
+@app.route('/edit')
 def modal():
     cookie = request.cookies.get('key')
     if cookie == key:
         file_key = request.args.get('id')
-        return render_template('modal.html', file_key=file_key)
+        return render_template('edit.html', file_key=file_key)
     else:
-        return "Unauthorized", 403  # Return a 403 Forbidden response
+        return redirect("/auth", error = "You are not logged in!")
 
 
 @app.route('/rename', methods=["POST"])
@@ -123,9 +123,9 @@ def rename():
         oldKey = request.form.get('oldKey')
         newKey = request.form.get('newKey')
         renameObject(oldKey, newKey)
-        return redirect('/dashboard')
+        return redirect('/panel')
     else:
-        return 'incorrect credentials'
+        return redirect('/auth', error="You are not logged in!")
     
 
 
