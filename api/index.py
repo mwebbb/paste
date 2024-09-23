@@ -112,9 +112,9 @@ def auth():
         else:
             return render_template("auth.html", error = "Incorrect key.")
 
-@app.route('/logout', methods=["POST"])
+@app.route('/logout', methods=["GET"])
 def logout():
-    if request.method == "POST":
+    if request.method == "GET":
         log_out = make_response(redirect('/auth'))
         log_out.set_cookie('key', '', expires=0)
         
