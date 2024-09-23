@@ -51,28 +51,32 @@ def create_paste(text):
 @app.route('/edit', methods=["GET", "POST"])
 def edit():
 
+
+    if request.method == "POST":
         cookie = request.cookies.get("key")
         if cookie == key:
 
-            if request.method == "POST":
             
-                newText = request.form.get('text')
-                file_name = request.form.get('file_name')
-                s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
-                s3.put_object(Bucket=BUCKET_NAME, Key=file_name, Body=text)
+            newText = request.form.get('text')
+            file_name = request.form.get('file_name')
+            s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
+            s3.put_object(Bucket=BUCKET_NAME, Key=file_name, Body=text)
 
-                return redirect(f"/v?id={file_name}")
+            return redirect(f"/v?id={file_name}")
             
-            elif request.method == "GET":
-                file_name = request.args.get('id')
+    elif request.method == "GET":
+        cookie = request.cookies.get("key")
+        if cookie == key:
 
-                if not file_name:
-                    return "No file id provided!"
+            file_name = request.args.get('id')
 
-                response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
-                content = html.escape(response['Body'].read().decode('utf-8'))
+            if not file_name:
+                return "No file id provided!"
+
+            response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
+            content = html.escape(response['Body'].read().decode('utf-8'))
             
-                return render_template('edit.html', oldtext=content)
+            return render_template('edit.html', oldtext=content)
 
 
 
