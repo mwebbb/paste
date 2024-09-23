@@ -6,9 +6,16 @@
 </head>
 
 <body>
-  <h3 class="title">de1tabin - fully anonymous text sharing <div style="align-items: right;"><a href="/auth"><button>auth</button></a> <a href="/v?id=tos"><button>tos</button>></a></div></h3>
+  <div class="header">
+    <h3 class="title">de1tabin - fully anonymous text sharing</h3>
+    <div class="button-container">
+      <a href="/auth"><button>auth</button></a>
+      <a href="/v?id=tos"><button>tos</button></a>
+    </div>
+  </div>
   <form action="/submit" method="post">
-    <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false"></textarea>
+    <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false"
+      data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false"></textarea>
     <h3><button id="createButton" class="submit" type="submit"><strong>[create]</strong></button></h3>
 
   </form>
@@ -24,7 +31,20 @@
     font-size: 20px;
   }
 
-  .submit, strong {
+  .submit,
+  strong {
     font-size: 15px;
+  }
+
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .button-container {
+    display: flex;
+    gap: 10px;
   }
 </style>
