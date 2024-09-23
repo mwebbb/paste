@@ -39,7 +39,7 @@ def listFiles():
         return []
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 
+app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 
 
 
 def create_paste(text):
