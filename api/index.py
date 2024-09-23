@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, make_response
+from flask import Flask, request, render_template, redirect, make_response, url_for
 import random
 import string
 import boto3
@@ -146,4 +146,4 @@ def request_entity_too_large(error):
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True, port="8080")
