@@ -1,7 +1,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>/login</title>
+    <title>/auth</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -11,7 +11,7 @@
     <h3>de1tabin - login</h3>
     <h6>{{ error }}</h6>
 
-    <form method="post" action="/login">
+    <form method="post" action="/auth">
         <input name="key" type="password" placeholder="enter access key..." id="key"></input>
         <button>enter</button>
     </form>

@@ -107,7 +107,7 @@ def delete():
             return redirect("auth.html", error = "Incorrect key.")
 
 @app.route('/edit')
-def modal():
+def edit():
     cookie = request.cookies.get('key')
     if cookie == key:
         file_key = request.args.get('id')
