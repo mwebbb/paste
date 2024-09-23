@@ -101,7 +101,12 @@ def paste():
 @app.route('/auth', methods=["GET", "POST"])
 def auth():
     if request.method == "GET":
-        return render_template('auth.html')
+        pw = request.cookies.get('key')
+        if pw == key:
+            return redirect('/panel')
+        elif pw != key:
+            return render_template('auth.html')
+        
     elif request.method == "POST":
         pw = request.form.get('key')
         if pw == key:
