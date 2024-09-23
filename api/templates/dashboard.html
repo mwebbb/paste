@@ -26,10 +26,7 @@
                 <tbody>
                     {% for file in files %}
                     <tr>
-                        <td>
-                            <a href="{{ url_for('paste', id=file['Key']) }}" target="_blank">{{ file['Key'] }}</a>
-                            <button class="open-modal" data-key="{{ file['Key'] }}">actions</button>
-                        </td>
+                        <td><a href="{{ url_for('paste', id=file['Key']) }}" target="_blank">{{ file['Key'] }}</a></td>
                         <td>{{ file['Size'] }}</td>
                     </tr>
                     {% endfor %}
@@ -37,59 +34,4 @@
             </table>
         </div>
     </div>
-
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" style="font-size: 200%">&times;</span>
-            <h3>viewing file: <span id="file-key">{{ file['Key'] }}</span></h3>
-            <div class="inline" style="margin-bottom: 20px;">
-                <a href="#" id="view-link" target="_blank">
-                    <button style="margin: 0;">view</button>
-                </a>
-
-                <form action="/delete" method="POST" style="margin: 0;">
-                    <input type="hidden" id="fileKeyInput" name="fileKey" value="">
-                    <button class="danger" type="submit" style="margin: 0;">delete</button>
-                </form>
-            </div>
-            <form action="/rename" method="POST">
-                <input type="hidden" id="renameOldKeyInput" name="oldKey" value="">
-                <input placeholder="new name..." minlength="5" maxlength="16" pattern="[a-zA-Z0-9]{5,16}" name="newKey">
-                <button>rename</button>
-            </form>
-        </div>
-    </div>
-<script>
-
-var modal = document.getElementById("myModal");
-
-// Get the button that opens the modal
-var buttons = document.querySelectorAll(".open-modal");
-
-buttons.forEach(function(button) {
-    button.onclick = function() {
-        var fileKey = this.getAttribute("data-key");
-        document.getElementById("file-key").textContent = fileKey;
-        modal.style.display = "block";
-    };
-});
-
-// Close modal functionality
-var span = document.getElementsByClassName("close")[0];
-
-span.onclick = function() {
-    modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
-
-
-
-
-</script>
 </body>
