@@ -31,7 +31,7 @@
                             <a href="{{ url_for('paste', id=file['Key']) }}" target="_blank">{{ file['Key'] }}</a>
                         </td>
                         <td>{{ file['Size'] }}</td>
-                        <td><a><button href="{{ url_for('edit', id=file['Key']) }}">actions</button></a></td>
+                        <td><a href="{{ url_for('edit', id=file['Key']) }}" target="_blank"><button>edit</button></a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
