@@ -57,7 +57,7 @@ def edit():
         if cookie == key:
 
             
-            newText = request.form.get('text')
+            newText = html.escape(request.form.get('text'))
             file_name = request.form.get('file_name')
             s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
             s3.put_object(Bucket=BUCKET_NAME, Key=file_name, Body=newText)
@@ -74,7 +74,7 @@ def edit():
                 return "No file id provided!"
 
             response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
-            content = html.escape(response['Body'].read().decode('utf-8'))
+            content = response['Body'].read().decode('utf-8')
             
             return render_template('edit.html', oldtext=content)
 
