@@ -88,7 +88,7 @@ def panel():
         showFiles = listFiles()
         return render_template('panel.html', files=showFiles)
     else:
-        return redirect("auth.html", error = "Incorrect key.")
+        return redirect(url_for('auth', error='You are not logged in.'))
 
 
 @app.route('/delete', methods=["POST"])
@@ -100,7 +100,7 @@ def delete():
             s3.delete_object(Bucket=BUCKET_NAME, Key=file)
             return redirect('/panel')
         else:
-            return redirect("auth.html", error = "Incorrect key.")
+            return redirect(url_for('auth', error='You are not logged in.'))
 
 @app.route('/edit')
 def edit():
@@ -112,7 +112,7 @@ def edit():
             file_key = request.args.get('id')
             return render_template('edit.html', file_key=file_key)
     else:
-            return redirect("/auth", error = "You are not logged in!")
+            return redirect(url_for('auth', error='You are not logged in.'))
 
 
 @app.route('/rename', methods=["POST"])
@@ -124,7 +124,7 @@ def rename():
         renameObject(oldKey, newKey)
         return redirect('/panel')
     else:
-        return redirect('/auth', error="You are not logged in!")
+        return redirect(url_for('auth', error='You are not logged in.'))
     
 
 
@@ -146,4 +146,4 @@ def request_entity_too_large(error):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port="8080")
+    app.run(debug=False)
