@@ -57,7 +57,7 @@ def edit():
         if cookie == key:
 
             
-            newText = html.escape(request.form.get('text'))
+            newText = request.form.get('text')
             file_name = request.form.get('file_name')
             s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
             s3.put_object(Bucket=BUCKET_NAME, Key=file_name, Body=newText)
@@ -92,7 +92,7 @@ def paste():
         response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
         content = response['Body'].read().decode('utf-8')
         processed_content = html.escape(content) 
-        return Response(f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px; '>{processed_content}</pre>", mimetype='text/html')
+        return Response(f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px;'>{processed_content}</pre>", mimetype='text/html')
     except s3.exceptions.NoSuchKey:
         return "<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px; '>Error: Paste not found</pre>", 404
     except Exception as e:
