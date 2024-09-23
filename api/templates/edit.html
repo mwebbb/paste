@@ -7,7 +7,7 @@
   
   <body>
     <div class="header">
-      <h3 class="title">editing {{ file['Key'] }}</h3>
+      <h3 class="title">editing file: {{ request.args.get('id') }}</h3>
     </div>
     <form action="/edit" method="post">
       <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false"
