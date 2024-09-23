@@ -1,0 +1,208 @@
+<body>
+<button id="openButton">actions</button>
+
+<!-- The Modal-->
+<div id="actionsModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>viewing file: {{ request.args.get('id') }}</h3>
+    <div style="justify-content: center; display: flex; gap: 10px;">
+        <a href="{{ url_for('paste', id=request.args.get('id')) }}" target="_blank"><button>view</button></a>
+        <form action="/delete" method="POST" style="display: inline;">
+            <input type="hidden" name="toDelete" value="{{ request.args.get('id') }}">
+            <button class="danger" type="submit">delete</button>
+        </form>
+    </div>
+    <form action="/rename" method="POST">
+        <input type="hidden" name="oldKey" value="{{ request.args.get('id') }}">
+        <input placeholder="new name..." minlength="5" maxlength="16" pattern="[a-zA-Z0-9]{5,16}" name="newKey">
+        <button>rename</button>
+    </form>
+    
+
+  </div>
+
+</div>
+
+<script>
+
+    var modal = document.getElementById("actionsModal");
+    
+    // Get the button that opens the modal
+    var btn = document.getElementById("openButton");
+    
+    var span = document.getElementsByClassName("close")[0];
+    
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+    
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+    
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+    
+    
+    
+    </script>
+    <style>
+    
+    .inline {
+        display: flex;
+        gap: 10px; /* Adjust space between buttons */
+        align-items: center; /* Center them vertically */
+    
+    }
+    
+    .danger {
+        
+        color: whitesmoke;
+    }
+    
+    .danger:hover {
+        border-color: red;
+        color: red;
+    }
+      
+    .modal {
+           display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */ 
+    }
+      
+    
+      .modal-content {
+      background-color: #050505;
+      margin: 15% auto; /* 15% from the top and centered */
+      padding: 20px;
+      border: 1px solid whitesmoke;
+      border-radius: 15px;
+      width: 80%; /* Could be more or less, depending on screen size */
+    
+    }
+    
+      .close {
+      color: white;
+      float: right;
+      font-weight: bold;
+    }
+    
+      .close:hover,
+    .close:focus {
+      text-decoration: none;
+      cursor: pointer;
+    }
+    
+    h3 {
+        font-size: 20px;
+        padding-bottom: 8px;
+        font-family: mono, monospace
+    }
+    
+    button,
+    input {
+    
+        background-color: #000000;
+        border-radius: 15px;
+        border: 1px solid #8f8f8f;
+        display: inline-block;
+        color: #ffffff;
+        font-family: mono, monospace;
+        font-size: 12px;
+        padding: 9px 14px;
+        text-decoration: none;
+        transition-duration: 200ms;
+    
+    
+    }
+    
+    button:hover,
+    input:hover {
+    
+        border-color: whitesmoke;
+    }
+    
+    
+    .altStyle {
+        background-color: black;
+        color: white;
+        font-family: mono, monospace;
+        text-align: center;
+        padding-top: 15%;
+    
+    }
+    
+    .title {
+    
+        padding-top: 15px;
+    
+    }
+    
+    textarea:focus {
+    
+        border-color: white;
+        outline: white;
+    }
+    
+    textarea:hover {
+        border-color: white;
+    
+    }
+    
+    textarea {
+        border-color: #8f8f8f;
+        height: 80%;
+        width: 98%;
+        background-color: black;
+        color: white;
+        font-size: 16px;
+        transition-duration: 200ms;
+        border-radius: 10px;
+        padding: 15px;
+    }
+    
+    table {
+        margin-left: auto;
+        margin-right: auto;
+        border-collapse: collapse;
+        border-color: white;
+        border-radius: 10px;
+    
+    }
+    th, td, tr {
+        border: white;
+        padding: 8px;
+        text-align: center;
+    }
+    th {
+        background-color: transparent;
+    }
+    a {
+        color: white;
+    }
+    
+    a:hover {
+        color: white;
+    }
+    
+    button {
+        cursor: pointer;
+        font-size: 10px;
+    }
+    </style>
+
+
+</body>

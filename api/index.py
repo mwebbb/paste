@@ -106,6 +106,15 @@ def delete():
         else:
             return "you are not logged in"
 
+@app.route('/modal')
+def modal():
+    cookie = request.cookies.get('key')
+    if cookie == key:
+        file_key = request.args.get('id')
+        return render_template('modal.html', file_key=file_key)
+    else:
+        return "Unauthorized", 403  # Return a 403 Forbidden response
+
 
 @app.route('/rename', methods=["POST"])
 def rename():

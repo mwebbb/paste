@@ -26,7 +26,10 @@
                 <tbody>
                     {% for file in files %}
                     <tr>
-                        <td><a href="{{ url_for('paste', id=file['Key']) }}" target="_blank">{{ file['Key'] }}</a></td>
+                        <td>
+                            <a href="{{ url_for('paste', id=file['Key']) }}" target="_blank">{{ file['Key'] }}</a>
+                            <button class="openModal" data-key="{{ file['Key'] }}">actions</button>
+                        </td>
                         <td>{{ file['Size'] }}</td>
                     </tr>
                     {% endfor %}
@@ -34,4 +37,31 @@
             </table>
         </div>
     </div>
+
+    <div id="actionsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+    <script>
+        $(document).on('click', '.openModal', function() {
+            const fileKey = $(this).data('key');
+            $.get(`/modal?id=${fileKey}`, function(data) {
+                $('#modalContent').html(data);
+                $('#actionsModal').css('display', 'block');
+            });
+        });
+
+        $('.close').on('click', function() {
+            $('#actionsModal').css('display', 'none');
+        });
+
+        $(window).on('click', function(event) {
+            if (event.target.id === 'actionsModal') {
+                $('#actionsModal').css('display', 'none');
+            }
+        });
+    </script>
+
 </body>

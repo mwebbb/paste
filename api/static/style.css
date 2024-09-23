@@ -1,3 +1,64 @@
+.inline {
+    display: flex;
+    gap: 10px;
+    /* Adjust space between buttons */
+    align-items: center;
+    /* Center them vertically */
+
+}
+
+.danger {
+
+    color: whitesmoke;
+}
+
+.danger:hover {
+    border-color: red;
+    color: red;
+}
+
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+}
+
+
+.modal-content {
+    background-color: #050505;
+    margin: 15% auto;
+    /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid whitesmoke;
+    border-radius: 15px;
+    width: 80%;
+    /* Could be more or less, depending on screen size */
+
+}
+
+.close {
+    color: white;
+    float: right;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    text-decoration: none;
+    cursor: pointer;
+}
+
 h3 {
     font-size: 20px;
     padding-bottom: 8px;
@@ -75,14 +136,18 @@ table {
 
 }
 
-th, td, tr {
-    border: 1px #111111;
+th,
+td,
+tr {
+    border: white;
     padding: 8px;
     text-align: center;
 }
+
 th {
     background-color: transparent;
 }
+
 a {
     color: white;
 }
