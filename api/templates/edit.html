@@ -1,32 +1,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>/edit</title>
+    <title>de1tabin</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-</head>
-<body>
-    
-
-    <div class="editor">
-      <h3 style="text-align: center;">viewing file: {{ request.args.get('id') }}</h3>
-      <div style="justify-content: center; display: flex; gap: 10px;">
-          <a href="{{ url_for('paste', id=request.args.get('id')) }}" target="_blank"><button>view</button></a>
-          <form action="/delete" method="POST" style="display: inline;">
-              <input type="hidden" name="toDelete" value="{{ request.args.get('id') }}">
-              <button class="danger" type="submit">delete</button>
-          </form>
-  </div>
+  </head>
   
-      <form action="/rename" method="POST" style="display:flex; gap: 10px; justify-content: center;">
-          <input type="hidden" name="oldKey" value="{{ request.args.get('id') }}">
-          <input placeholder="new name..." minlength="3" maxlength="16" pattern="[a-zA-Z0-9]{3,16}" name="newKey">
-          <button>rename</button>
-      </form>
-          </div>
-  
-  
+  <body>
+    <div class="header">
+      <h3 class="title">editing {{ file['Key'] }}</h3>
     </div>
+    <form action="/edit" method="post">
+      <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false"
+        data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false">{{ oldtext }}</textarea>
+      <h3><button id="createButton" class="submit" type="submit"><strong>save</strong></button></h3>
   
-  
+    </form>
   </body>
+  
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: mono, monospace;
+      padding-left: 1%;
+      text-align: left;
+      font-size: 20px;
+    }
+  
+    .submit,
+    strong {
+      font-size: 15px;
+    }
+  
+  
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  
+    .button-container {
+      display: flex;
+      gap: 10px;
+    }
+  </style>
+  

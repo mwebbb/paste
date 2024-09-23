@@ -1,0 +1,35 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>/edit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+    
+
+    <div class="editor">
+      <h3 style="text-align: center;">viewing file: {{ request.args.get('id') }}</h3>
+      <div style="justify-content: center; display: flex; gap: 10px;">
+          <a href="{{ url_for('paste', id=request.args.get('id')) }}" target="_blank"><button>view</button></a>
+          <a href="{{ url_for('edit', id=request.args.get('id')) }}"><button>edit</button></a>
+          <form action="/delete" method="POST" style="display: inline;">
+              <input type="hidden" name="toDelete" value="{{ request.args.get('id') }}">
+              <button class="danger" type="submit">delete</button>
+          </form>
+
+
+  </div>
+  
+      <form action="/rename" method="POST" style="display:flex; gap: 10px; justify-content: center;">
+          <input type="hidden" name="oldKey" value="{{ request.args.get('id') }}">
+          <input placeholder="new name..." minlength="3" maxlength="16" pattern="[a-zA-Z0-9]{3,16}" name="newKey">
+          <button>rename</button>
+      </form>
+          </div>
+  
+  
+    </div>
+  
+  
+  </body>

@@ -48,6 +48,34 @@ def create_paste(text):
     s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=text)
     return filename
 
+@app.route('/edit', methods=["GET", "POST"])
+def edit():
+
+        file_name = request.args.get('id')
+
+        if not file_name:
+            return "No file id provided!"
+        cookie = request.cookies.get("key")
+        if cookie == key:
+
+            if request.method == "POST":
+            
+                newText = request.form.get('text')
+            
+                s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
+                s3.put_object(Bucket=BUCKET_NAME, Key=file_name, Body=text)
+
+                return redirect(f"/v?id={file_name}")
+            
+            elif request.method == "GET":
+
+                response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
+                content = html.escape(response['Body'].read().decode('utf-8'))
+            
+                return render_template('edit.html', oldtext=content)
+
+
+
 
 @app.route('/v')
 def paste():
@@ -102,15 +130,15 @@ def delete():
         else:
             return redirect('/auth')
 
-@app.route('/edit')
-def edit():
+@app.route('/manage')
+def manage():
     cookie = request.cookies.get('key')
     if cookie == key:
         if request.args.get('id') == None:
             return "Error: no file id provided! Please try again."
         else:
             file_key = request.args.get('id')
-            return render_template('edit.html', file_key=file_key)
+            return render_template('manage.html', file_key=file_key)
     else:
             return redirect('/auth')
 
