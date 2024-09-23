@@ -23,7 +23,7 @@
 </div>
 <style>
     
-    .inline {
+    .inline, body {
         display: flex;
         gap: 10px; /* Adjust space between buttons */
         align-items: center; /* Center them vertically */
@@ -54,12 +54,9 @@
     
       .modal-content {
       background-color: #050505;
-      margin: 15% auto; /* 15% from the top and centered */
       padding: 20px;
       border: 1px solid whitesmoke;
-      border-radius: 15px;
-      width: 80%; /* Could be more or less, depending on screen size */
-    
+      border-radius: 15px;    
     }
     
       .close {
@@ -77,7 +74,8 @@
     h3 {
         font-size: 20px;
         padding-bottom: 8px;
-        font-family: mono, monospace
+        font-family: mono, monospace;
+        color: white;
     }
     
     button,
