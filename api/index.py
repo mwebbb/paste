@@ -25,6 +25,11 @@ def renameObject(old, new):
         Key=new
     )
 
+    s3.delete_object(
+        Bucket=BUCKET_NAME,
+        Key=old
+    )
+
 def listFiles():
     try:
         response = s3.list_objects_v2(Bucket=BUCKET_NAME)
@@ -32,15 +37,6 @@ def listFiles():
         return files
     except NoCredentialsError:
         return []
-
-def extract_keys(files):
-    # Extract the 'Key' from each file dictionary
-    return [file['Key'] for file in files]
-
-def listKeys():
-    files = listFiles()
-    return extract_keys(files)
-
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 
