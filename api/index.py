@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, make_response, url_for
+from flask import Flask, request, render_template, redirect, make_response, url_for, Response
 import random
 import string
 import boto3
@@ -91,8 +91,8 @@ def paste():
     try:
         response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
         content = response['Body'].read().decode('utf-8')
-        processed_content = html.escape(content)
-        return f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px; '>{processed_content}</pre>"
+        processed_content = html.escape(content) 
+        return Response(f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px; '>{processed_content}</pre>", mimetype='text/html')
     except s3.exceptions.NoSuchKey:
         return "<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px; '>Error: Paste not found</pre>", 404
     except Exception as e:
