@@ -20,7 +20,7 @@
   
       <form action="/rename" method="POST" style="display:flex; gap: 10px; justify-content: center;">
           <input type="hidden" name="oldKey" value="{{ request.args.get('id') }}">
-          <input placeholder="new name..." minlength="3" maxlength="16" pattern="[a-zA-Z0-9]{5,16}" name="newKey">
+          <input placeholder="new name..." minlength="3" maxlength="16" pattern="[a-zA-Z0-9]{3,16}" name="newKey">
           <button>rename</button>
       </form>
           </div>
