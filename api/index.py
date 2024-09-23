@@ -106,10 +106,13 @@ def delete():
 def edit():
     cookie = request.cookies.get('key')
     if cookie == key:
-        file_key = request.args.get('id')
-        return render_template('edit.html', file_key=file_key)
+        if request.args.get('id') == None:
+            return "Error: no file id provided! Please try again."
+        else:
+            file_key = request.args.get('id')
+            return render_template('edit.html', file_key=file_key)
     else:
-        return redirect("/auth", error = "You are not logged in!")
+            return redirect("/auth", error = "You are not logged in!")
 
 
 @app.route('/rename', methods=["POST"])
