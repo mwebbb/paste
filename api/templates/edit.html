@@ -13,7 +13,7 @@
       <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false"
         data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false">{{ oldtext }}</textarea>
       <h3><button id="createButton" class="submit" type="submit"><strong>save</strong></button></h3>
-  
+        <input type="hidden" name="file_name" value="{{ request.args.get('id') }}">
     </form>
   </body>
   

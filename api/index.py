@@ -57,7 +57,7 @@ def edit():
             if request.method == "POST":
             
                 newText = request.form.get('text')
-            
+                file_name = request.form.get('file_name')
                 s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
                 s3.put_object(Bucket=BUCKET_NAME, Key=file_name, Body=text)
 
