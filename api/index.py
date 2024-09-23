@@ -5,7 +5,7 @@ import boto3
 import os
 from botocore.exceptions import NoCredentialsError
 import html
-
+from datetime import timedelta
 
 s3 = boto3.client(
     's3',
@@ -106,12 +106,19 @@ def auth():
         pw = request.form.get('key')
         if pw == key:
             resp = make_response(redirect('/panel'))
-            resp.set_cookie('key', pw)
+            resp.set_cookie('key', pw, max_age=timedelta(hours=12))
 
             return resp
         else:
             return render_template("auth.html", error = "Incorrect key.")
 
+@app.route('/logout', methods=["POST"])
+def logout():
+    if request.method == "POST":
+        log_out = make_response(redirect('/auth'))
+        log_out.set_cookie('key', '', expires=0)
+        
+        return log_out
     
 @app.route('/panel')
 def panel():

@@ -8,7 +8,7 @@
 
 <body class="altStyle">
     <div>
-        <h3>file list</h3>
+        <h3>admin panel</h3>
         <div>
             <form action="/delete" method="POST">
                 <input type="text" name="toDelete" placeholder="file name..."></input>
@@ -36,7 +36,12 @@
                     {% endfor %}
                 </tbody>
             </table>
+            
         </div>
+        <form action="/logout">
+            <button class="danger">log out</button>
+        </form>
+
     </div>
 
     <div id="actionsModal" class="modal" style="display: none;">
