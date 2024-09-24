@@ -1,77 +1,77 @@
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>deltabin</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>deltabin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-  <div class="header">
-    <h3 class="title">deltabin - fully anonymous text sharing</h3>
-    <div class="button-container" style="margin-right: 2%">
-      <a href="/v?id=tos" target="_blank"><button>tos</button></a>
-      <a href="/auth"><button>auth</button></a>
+    <div class="header">
+        <h3 class="title">deltabin - fully anonymous text sharing</h3>
+        <div class="button-container" style="margin-right: 2%">
+            <a href="/v?id=tos" target="_blank"><button>tos</button></a>
+            <a href="/auth"><button>auth</button></a>
+        </div>
     </div>
-  </div>
-  <form action="/submit" method="post">
-    <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false"
-      data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false"></textarea>
-    <h3><button id="createButton" class="submit" type="submit"><strong>submit</strong></button></h3>
+    <form action="/submit" method="post">
+        <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false"
+            data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false"></textarea>
+        <h3><button id="createButton" class="submit" type="submit"><strong>submit</strong></button></h3>
 
-  </form>
+    </form>
 </body>
 
 <style>
-  body {
-    background-color: black;
-    color: white;
-    font-family: mono, monospace;
-    padding-left: 1%;
-    text-align: left;
-    font-size: 20px;
-  }
+    body {
+        background-color: black;
+        color: white;
+        font-family: mono, monospace;
+        padding-left: 1%;
+        text-align: left;
+        font-size: 20px;
+    }
 
-  .submit,
-  strong {
-    font-size: 15px;
-  }
+    .submit,
+    strong {
+        font-size: 15px;
+    }
 
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-  .button-container {
-    display: flex;
-    gap: 10px;
-  }
+    .button-container {
+        display: flex;
+        gap: 10px;
+    }
 </style>
 
 <script>
 
-  var inputField = document.getElementById('text');
+    var inputField = document.getElementById('text');
 
-  inputField.onkeydown = function (e) { 
+    inputField.onkeydown = function (e) {
 
-    if (e.keyCode === 9) { 
+        if (e.keyCode === 9) {
 
-      this.setRangeText(
+            this.setRangeText(
 
-        '    ',
+                '    ',
 
-        this.selectionStart,
+                this.selectionStart,
 
-        this.selectionStart,
+                this.selectionStart,
 
-        'end'
+                'end'
 
-      )
+            )
 
-      return false; 
-    }
+            return false;
+        }
 
-  };
+    };
 
 </script>
