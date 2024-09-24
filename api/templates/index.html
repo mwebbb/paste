@@ -48,3 +48,30 @@
     gap: 10px;
   }
 </style>
+
+<script>
+
+  var inputField = document.getElementById('text');
+
+  inputField.onkeydown = function (e) { 
+
+    if (e.keyCode === 9) { 
+
+      this.setRangeText(
+
+        '\t',
+
+        this.selectionStart,
+
+        this.selectionStart,
+
+        'end'
+
+      )
+
+      return false; 
+    }
+
+  };
+
+</script>
