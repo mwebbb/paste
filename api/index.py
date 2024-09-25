@@ -46,7 +46,7 @@ app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024
 
 
 def create_paste(text):
-    filename = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(6))
+    filename = ''.join(random.choice(string.ascii_letters + string.digits + "_-") for _ in range(4))
 
     s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=text)
     return filename
@@ -168,7 +168,13 @@ def rename():
     if cookie == key:
         oldKey = request.form.get('oldKey')
         newKey = request.form.get('newKey')
-        renameObject(oldKey, newKey)
+
+        if not newKey:
+            randomKey = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(4))
+            renameObject(oldKey, randomKey)
+        else:
+
+            renameObject(oldKey, newKey)
         return redirect('/panel')
     else:
         return redirect('/auth')
