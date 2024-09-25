@@ -169,11 +169,8 @@ def manage():
             return "Error: no file id provided! Please try again."
         else:
             file_key = request.args.get('id')
-            if file_key in listFiles():
 
-                return render_template('manage.html', file_key=file_key)
-            else:
-                return "File does not exist"
+            return render_template('manage.html', file_key=file_key)
     else:
             return redirect('/auth')
 
