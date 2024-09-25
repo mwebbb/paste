@@ -80,10 +80,6 @@ def edit():
             if not file_name:
                 return "No file id provided!"
 
-            if file_name not in listFiles():
-
-                return "File does not exist"
-
 
 
 
