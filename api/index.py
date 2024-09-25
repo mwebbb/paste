@@ -6,6 +6,18 @@ import os
 from botocore.exceptions import NoCredentialsError
 import html
 from datetime import timedelta
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["100 per day", "50 per hour"],
+    storage_uri="memory://",
+)
+
+
 
 s3 = boto3.client(
     's3',
@@ -173,6 +185,7 @@ def rename():
 
 
 @app.route('/')
+@limiter.exempt
 def home():
     return render_template('index.html')
 
