@@ -172,10 +172,13 @@ def rename():
         if not newKey:
             randomKey = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(4))
             renameObject(oldKey, randomKey)
+            return redirect(f'/manage?id={randomKey}')
         else:
 
             renameObject(oldKey, newKey)
-        return redirect('/panel')
+            return redirect(f'/manage?id={newKey}')
+
+        
     else:
         return redirect('/auth')
     
