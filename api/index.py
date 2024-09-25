@@ -123,7 +123,7 @@ def auth():
 @app.route('/logout', methods=["GET"])
 def logout():
     if request.method == "GET":
-        log_out = make_response(redirect('/auth'))
+        log_out = make_response(redirect('/'))
         log_out.set_cookie('key', '', expires=0)
         
         return log_out
