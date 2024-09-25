@@ -66,6 +66,10 @@ def edit():
             s3.put_object(Bucket=BUCKET_NAME, Key=file_name, Body=newText)
 
             return redirect(f"/v?id={file_name}")
+        
+        else:
+            return redirect("/auth")
+
             
     elif request.method == "GET":
         cookie = request.cookies.get("key")
@@ -75,6 +79,13 @@ def edit():
 
             if not file_name:
                 return "No file id provided!"
+
+            if file_name not in listFiles():
+
+                return "File does not exist"
+
+
+
 
             response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
             content = response['Body'].read().decode('utf-8')
@@ -90,6 +101,7 @@ def paste():
     
     if not file_name:
         return "Error: No file name provided", 400
+    
     
     try:
         response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
@@ -157,7 +169,11 @@ def manage():
             return "Error: no file id provided! Please try again."
         else:
             file_key = request.args.get('id')
-            return render_template('manage.html', file_key=file_key)
+            if file_key in listFiles():
+
+                return render_template('manage.html', file_key=file_key)
+            else:
+                return "File does not exist"
     else:
             return redirect('/auth')
 
