@@ -1,19 +1,20 @@
 body {
-          
+
     background: black;
     justify-content: center;
     align-items: center;
 }
+
 .inline {
     display: flex;
-    gap: 10px; /* Adjust space between buttons */
-    align-items: center; /* Center them vertically */
+    gap: 10px;
+    align-items: center;
     background-color: black;
 
 }
 
 .danger {
-    
+
     color: whitesmoke;
 }
 
@@ -21,23 +22,26 @@ body {
     border-color: red;
     color: red;
 }
-  
-.modal {
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */ 
-}
-  
 
-  .editor {
-  background-color: #050505;
-  padding: 20px;
-  border: 1px solid whitesmoke;
-  border-radius: 15px;    
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+
+.editor {
+    background-color: #050505;
+    padding: 20px;
+    border: 1px solid whitesmoke;
+    border-radius: 15px;
+    margin: auto;
+    align-items: center;
+
 }
 
 
@@ -119,14 +123,19 @@ table {
     border-radius: 10px;
 
 }
-th, td, tr {
+
+th,
+td,
+tr {
     border: white;
     padding: 8px;
     text-align: center;
 }
+
 th {
     background-color: transparent;
 }
+
 a {
     color: white;
 }
