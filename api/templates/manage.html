@@ -12,7 +12,7 @@
     <div class="editor">
         <h3 style="text-align: center;">viewing file: {{ request.args.get('id') }}</h3>
         <div style="justify-content: center; display: flex; gap: 10px;">
-            <a href="{{ url_for('paste', id=request.args.get('id')) }}" target="_blank"><button>view</button></a>
+            <a href="{{ url_for('paste', filename=request.args.get('id')) }}" target="_blank"><button>view</button></a>
             <a href="{{ url_for('edit', id=request.args.get('id')) }}"><button>edit</button></a>
             <form action="/delete" method="POST" style="display: inline;">
                 <input type="hidden" name="toDelete" value="{{ request.args.get('id') }}">
