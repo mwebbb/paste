@@ -51,6 +51,15 @@ def listFiles():
 
     return file_names
 
+def listFiles2():
+    try:
+        response = s3.list_objects_v2(Bucket=BUCKET_NAME)
+        files = response.get('Contents', [])
+        return files
+    except NoCredentialsError:
+        return []
+
+
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 
 
@@ -148,8 +157,7 @@ def logout():
 def panel():
     cookie = request.cookies.get('key')
     if cookie == key:
-        showFiles = listFiles()
-        return render_template('panel.html', files=showFiles)
+        return render_template('panel.html', files=listFiles2())
     else:
         return redirect('/auth')
 
