@@ -124,7 +124,7 @@ def paste(id):
         except Exception as e:
             return f"Error: {str(e)}", 500
     else:
-        abort(404)
+        return f"file {id} not found!"
 
 @app.route('/auth', methods=["GET", "POST"])
 def auth():
