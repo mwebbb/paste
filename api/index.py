@@ -49,7 +49,7 @@ def listFiles():
         for obj in response['Contents']:
             file_names.append(obj['Key'])
 
-    return listOfKeys
+    return file_names
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 
