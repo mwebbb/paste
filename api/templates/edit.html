@@ -3,45 +3,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>de1tabin</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  </head>
-  
-  <body>
+</head>
+
+<body>
     <div class="header">
-      <h3 class="title">editing file: {{ request.args.get('id') }}</h3>
+        <h3 class="title">editing file: {{ request.args.get('id') }}</h3>
     </div>
     <form action="/edit" method="post">
-      <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false"
-        data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false">{{ oldtext }}</textarea>
-      <h3><button id="createButton" class="submit" type="submit"><strong>save</strong></button></h3>
+        <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false"
+            data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false">{{ oldtext }}</textarea>
+        <h3><button id="createButton" class="submit" type="submit"><strong>save</strong></button></h3>
         <input type="hidden" name="file_name" value="{{ request.args.get('id') }}">
     </form>
-  </body>
-  
-  <style>
+</body>
+
+<style>
     body {
-      background-color: black;
-      color: white;
-      font-family: mono, monospace;
-      padding-left: 1%;
-      text-align: left;
-      font-size: 20px;
+        background-color: black;
+        color: white;
+        font-family: mono, monospace;
+        padding-left: 1%;
+        text-align: left;
+        font-size: 20px;
     }
-  
+
     .submit,
     strong {
-      font-size: 15px;
+        font-size: 15px;
     }
-  
-  
+
+
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
-  
+
     .button-container {
-      display: flex;
-      gap: 10px;
+        display: flex;
+        gap: 10px;
     }
-  </style>
-  
+</style>
+
+<script>
+
+    var inputField = document.getElementById('text');
+
+    inputField.onkeydown = function (e) {
+
+        if (e.keyCode === 9) {
+
+            this.setRangeText(
+
+                '    ',
+
+                this.selectionStart,
+
+                this.selectionStart,
+
+                'end'
+
+            )
+
+            return false;
+        }
+
+    };
+
+</script>
