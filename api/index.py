@@ -110,12 +110,12 @@ def edit():
 
 
 
-@app.route('/<filename>')
-def paste(filename):
+@app.route('/<id>')
+def paste(id):
         
     if filename in listFiles():
         try:
-            response = s3.get_object(Bucket=BUCKET_NAME, Key=filename)
+            response = s3.get_object(Bucket=BUCKET_NAME, Key=id)
             content = response['Body'].read().decode('utf-8')
             processed_content = html.escape(content) 
             return Response(f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px;'>{processed_content}</pre>", mimetype='text/html')
