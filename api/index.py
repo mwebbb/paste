@@ -65,7 +65,7 @@ def edit():
             s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
             s3.put_object(Bucket=BUCKET_NAME, Key=file_name, Body=newText)
 
-            return redirect(f"/v?id={file_name}")
+            return redirect(f"/{file_name}")
         
         else:
             return redirect("/auth")
@@ -91,16 +91,12 @@ def edit():
 
 
 
-@app.route('/v')
-def paste():
-    file_name = request.args.get('id')
-    
-    if not file_name:
-        return "Error: No file name provided", 400
-    
+@app.route('/<filename>')
+def paste(filename):
+        
     
     try:
-        response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
+        response = s3.get_object(Bucket=BUCKET_NAME, Key=filename)
         content = response['Body'].read().decode('utf-8')
         processed_content = html.escape(content) 
         return Response(f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px;'>{processed_content}</pre>", mimetype='text/html')
@@ -202,7 +198,7 @@ def home():
 def submit():
     text = request.form.get('text')
     
-    return redirect(f"/v?id={create_paste(text)}")
+    return redirect(f"/{create_paste(text)}")
     
 
 @app.errorhandler(413)
