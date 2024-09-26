@@ -113,7 +113,7 @@ def edit():
 @app.route('/<id>')
 def paste(id):
         
-    if filename in listFiles():
+    if id in listFiles():
         try:
             response = s3.get_object(Bucket=BUCKET_NAME, Key=id)
             content = response['Body'].read().decode('utf-8')
