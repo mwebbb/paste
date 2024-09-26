@@ -123,8 +123,8 @@ def paste(id):
             return "<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px; '>Error: Paste not found</pre>", 404
         except Exception as e:
             return f"Error: {str(e)}", 500
-        else:
-            abort(404)
+    else:
+        abort(404)
 
 @app.route('/auth', methods=["GET", "POST"])
 def auth():
