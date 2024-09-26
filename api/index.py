@@ -34,12 +34,22 @@ def renameObject(old, new):
     )
 
 def listFiles():
-    try:
-        response = s3.list_objects_v2(Bucket=BUCKET_NAME)
-        files = response.get('Contents', [])
-        return files
-    except NoCredentialsError:
-        return []
+    # Create a session using your AWS credentials
+    s3 = boto3.client('s3')
+
+    # List to hold file names
+    file_names = []
+
+    # Use the list_objects_v2 method to get the files in the bucket
+    response = s3.list_objects_v2(Bucket=BUCKET_NAME)
+
+    # Check if 'Contents' is in the response
+    if 'Contents' in response:
+        # Loop through the objects and get their file names
+        for obj in response['Contents']:
+            file_names.append(obj['Key'])
+
+    return listOfKeys
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 
@@ -94,16 +104,18 @@ def edit():
 @app.route('/<filename>')
 def paste(filename):
         
-    
-    try:
-        response = s3.get_object(Bucket=BUCKET_NAME, Key=filename)
-        content = response['Body'].read().decode('utf-8')
-        processed_content = html.escape(content) 
-        return Response(f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px;'>{processed_content}</pre>", mimetype='text/html')
-    except s3.exceptions.NoSuchKey:
-        return "<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px; '>Error: Paste not found</pre>", 404
-    except Exception as e:
-        return f"Error: {str(e)}", 500
+    if filename in listFiles():
+        try:
+            response = s3.get_object(Bucket=BUCKET_NAME, Key=filename)
+            content = response['Body'].read().decode('utf-8')
+            processed_content = html.escape(content) 
+            return Response(f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px;'>{processed_content}</pre>", mimetype='text/html')
+        except s3.exceptions.NoSuchKey:
+            return "<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px; '>Error: Paste not found</pre>", 404
+        except Exception as e:
+            return f"Error: {str(e)}", 500
+        else:
+            abort(404)
 
 @app.route('/auth', methods=["GET", "POST"])
 def auth():
