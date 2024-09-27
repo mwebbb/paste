@@ -9,7 +9,7 @@ from datetime import timedelta
 
 
 
-badName = ['auth','edit','logout', 'panel', 'manage','delete','submit','']
+badName = ['auth','edit','logout', 'panel', 'manage','delete','submit','rename']
 
 s3 = boto3.client(
     's3',
@@ -200,9 +200,11 @@ def rename():
             renameObject(oldKey, randomKey)
             return redirect(f'/manage?id={randomKey}')
         else:
-
-            renameObject(oldKey, newKey)
-            return redirect(f'/manage?id={newKey}')
+            if newKey not in badName:
+                renameObject(oldKey, newKey)
+                return redirect(f'/manage?id={newKey}')
+            else:
+                return redirect(f"/manage?id={oldKey}")
 
         
     else:
