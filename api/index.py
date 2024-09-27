@@ -65,8 +65,8 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 
 
 
-def create_paste(length, text):
-    filename = ''.join(random.choice(string.ascii_letters + string.digits + "_-") for _ in range(str(length)))
+def create_paste(text):
+    filename = ''.join(random.choice(string.ascii_letters + string.digits + "___---") for _ in range(5))
 
     s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=text)
     return filename
@@ -218,8 +218,7 @@ def home():
 @app.route('/submit', methods=['POST'])
 def submit():
     text = request.form.get('text')
-    filenameLength = int(request.form.get('fileLength'))
-    return redirect(f"/{create_paste(text, filenameLength)}")
+    return redirect(f"/{create_paste(text)}")
     
 
 @app.errorhandler(413)
