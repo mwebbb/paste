@@ -9,6 +9,7 @@ from datetime import timedelta
 
 
 
+badName = ['auth','edit','logout', 'panel', 'manage','delete','submit','']
 
 s3 = boto3.client(
     's3',
