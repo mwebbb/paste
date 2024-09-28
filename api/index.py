@@ -119,10 +119,9 @@ def paste(id):
         try:
             response = s3.get_object(Bucket=BUCKET_NAME, Key=id)
             content = response['Body'].read().decode('utf-8')
-            processed_content = html.escape(content) 
-            return Response(f"<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px;'>{processed_content}</pre>", mimetype='text/html')
+            return Response(content, mimetype='text/plain')
         except s3.exceptions.NoSuchKey:
-            return "<pre style='font-family: mono, monospace; text-wrap: wrap; font-size: 12px; '>Error: Paste not found</pre>", 404
+            return Response("404", mimetype='text/plain')
         except Exception as e:
             return f"Error: {str(e)}", 500
     else:
