@@ -62,7 +62,7 @@ def listFiles2():
 
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 1024
+app.config['MAX_CONTENT_LENGTH'] = 50000
 
 
 def create_paste(text):
@@ -226,7 +226,7 @@ def submit():
 
 @app.errorhandler(413)
 def request_entity_too_large(error):
-    return "Error: File too large. Maximum allowed size is 5MB.", 413
+    return "Error: File too large. Maximum allowed size is 50KB.", 413
 
 
 if __name__ == '__main__':
