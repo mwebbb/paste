@@ -32,8 +32,8 @@
                             <a href="{{ url_for('paste', id=file['Key']) }}" target="_blank">{{ file['Key'] }}</a>
                         </td>
                         <td>{{ file['Size'] }}B</td>
-                        <td><a href="{{ url_for('manage', id=file['Key']) }}" name="toDelete"><button>manage</button></a></td>
-                        <td><form action="/delete" method="POST"><input type="hidden" value="{{ file['Key'] }}"><button type="submit">delete</button></form></td>
+                        <td><a href="{{ url_for('manage', id=file['Key']) }}"><button>manage</button></a></td>
+                        <td><form action="/delete" method="POST"><input type="hidden" value="{{ file['Key'] }}" name="toDelete"><button type="submit">delete</button></form></td>
 
                     </tr>
                     {% endfor %}
