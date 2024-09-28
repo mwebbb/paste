@@ -224,7 +224,7 @@ def submit():
 
 @app.errorhandler(413)
 def request_entity_too_large(error):
-    return "Error: File too large. Maximum allowed size is 50KB.", 413
+    return "Error: File too large. Maximum allowed size is 256KB.", 413
 
 
 if __name__ == '__main__':
