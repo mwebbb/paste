@@ -61,7 +61,7 @@ def listFiles2():
 
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 50000
+app.config['MAX_CONTENT_LENGTH'] = 256 * 1024
 
 
 def create_paste(text):
