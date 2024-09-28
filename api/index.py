@@ -59,6 +59,13 @@ def listFiles2():
     except NoCredentialsError:
         return []
 
+def validate(id):
+    if id in listFiles():
+        return True
+    elif id not in listFiles():
+        return False
+
+
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 256 * 1024
@@ -114,7 +121,7 @@ def edit():
 @app.route('/<id>')
 def paste(id):
         
-    if id in listFiles():
+    if validate(id) == True:
         try:
             response = s3.get_object(Bucket=BUCKET_NAME, Key=id)
             content = response['Body'].read().decode('utf-8')
@@ -179,12 +186,16 @@ def manage():
     if cookie == key:
         if request.args.get('id') == None:
             return "Error: no file id provided! Please try again."
-        else:
-            file_key = request.args.get('id')
+        if validate(request.args.get('id')) == True:
 
+            file_key = request.args.get('id')
             return render_template('manage.html', file_key=file_key)
+            
+        elif validate(request.args.get('id')) == False:
+            return Response("404", mimetype='text/plain')
+
     else:
-            return redirect('/auth')
+        return redirect('/auth')
 
 
 @app.route('/rename', methods=["POST"])
