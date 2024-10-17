@@ -29,12 +29,17 @@
                     {% for file in files %}
                     <tr>
                         <td>
-                            <a href="{{ url_for('paste', id=file['Key']) }}" target="_blank">{{ file['Key'] }}</a>
+                            <div>
+                                <a href="{{ url_for('manage', id=file['Key']) }}">
+                                    <button type="button">manage</button>
+                                </a>
+                                <form action="/delete" method="POST">
+                                    <input type="hidden" value="{{ file['Key'] }}" name="toDelete">
+                                    <button type="submit">delete</button>
+                                </form>
+                            </div>
                         </td>
-                        <td>{{ file['Size'] }}B</td>
-                        <td><a href="{{ url_for('manage', id=file['Key']) }}"><button>manage</button></a></td>
-                        <td><form action="/delete" method="POST"><input type="hidden" value="{{ file['Key'] }}" name="toDelete"><button type="submit">delete</button></form></td>
-
+                        
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -53,24 +58,5 @@
             <div id="modalContent"></div>
         </div>
     </div>
-    <script>
-        $(document).on('click', '.openModal', function() {
-            const fileKey = $(this).data('key');
-            $.get(`/modal?id=${fileKey}`, function(data) {
-                $('#modalContent').html(data);
-                $('#actionsModal').css('display', 'block');
-            });
-        });
-
-        $('.close').on('click', function() {
-            $('#actionsModal').css('display', 'none');
-        });
-
-        $(window).on('click', function(event) {
-            if (event.target.id === 'actionsModal') {
-                $('#actionsModal').css('display', 'none');
-            }
-        });
-    </script>
 
 </body>
