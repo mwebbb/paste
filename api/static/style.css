@@ -132,6 +132,11 @@ tr {
     border: white;
     padding: 8px;
     text-align: center;
+    
+}
+
+td {
+    display: flex
 }
 
 th {
