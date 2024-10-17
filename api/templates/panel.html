@@ -33,7 +33,7 @@
                         </td>
                         <td>{{ file['Size'] }}B</td>
                         <td><a href="{{ url_for('manage', id=file['Key']) }}"><button>manage</button></a></td>
-                        <td><form action="/delete" method="POST"><input type="hidden" value="{{ file['Key'] }}" name="toDelete"><button type="submit">delete</button></form></td>
+                        <td><form action="/delete" method="POST"><input type="hidden" value="{{ file['Key'] }}" name="toDelete" style="margin: none;"><button type="submit">delete</button></form></td>
 
                     </tr>
                     {% endfor %}
