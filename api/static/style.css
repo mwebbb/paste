@@ -135,22 +135,6 @@ tr {
     
 }
 
-td {
-    vertical-align: middle;
-    padding: 8px;
-    text-align: center;
-}
-
-td > div {
-    display: inline-flex; /* Inline-flex keeps the buttons in a row */
-    align-items: center; /* Centers the buttons vertically */
-    gap: 5px; /* Adjust spacing between buttons */
-}
-
-form {
-    display: inline; /* Makes the form act like an inline element */
-    margin: 0; /* Reset margin for consistent alignment */
-}
 
 
 th {
