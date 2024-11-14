@@ -31,21 +31,17 @@ def renameObject(old, new):
     s3.delete_object(
         Bucket=BUCKET_NAME,
         Key=old
-    )
+    )   
 
 def listFiles():
-    # Create a session using your AWS credentials
     s3 = boto3.client('s3')
 
-    # List to hold file names
     file_names = []
 
-    # Use the list_objects_v2 method to get the files in the bucket
     response = s3.list_objects_v2(Bucket=BUCKET_NAME)
 
-    # Check if 'Contents' is in the response
     if 'Contents' in response:
-        # Loop through the objects and get their file names
+        
         for obj in response['Contents']:
             file_names.append(obj['Key'])
 
@@ -116,7 +112,6 @@ def edit():
             return render_template('edit.html', oldtext=content)
 
 
-# hi
 
 @app.route('/<id>')
 def paste(id):
