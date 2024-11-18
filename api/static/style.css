@@ -121,7 +121,7 @@ table {
     margin-left: auto;
     margin-right: auto;
     border-collapse: collapse;
-    border-color: white;
+    border-color: 1px solid white;
     border-radius: 10px;
 
 }
@@ -135,10 +135,16 @@ tr {
     
 }
 
+table td, table th {
+    border: 1px solid white;
+}
+
+
 
 
 th {
     background-color: transparent;
+
 }
 
 a {
