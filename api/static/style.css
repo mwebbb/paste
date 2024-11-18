@@ -124,21 +124,17 @@ table {
     border-spacing: 0;
     border-radius: 10px; 
     overflow: hidden; 
-    border: 1px solid white; 
 }
 
 th,
 td,
 tr {
-    border: white;
     padding: 13px;
     text-align: center;
     
 }
 
-table td, table th {
-    border: 1px solid white;
-}
+
 
 
 
