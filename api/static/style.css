@@ -120,10 +120,11 @@ textarea {
 table {
     margin-left: auto;
     margin-right: auto;
-    border-collapse: collapse;
-    border-color: 1px solid white;
-    border-radius: 10px;
-
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px; 
+    overflow: hidden; 
+    border: 1px solid white; 
 }
 
 th,
