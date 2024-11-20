@@ -67,10 +67,13 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 256 * 1024
 
 
-def create_paste(text):
+def create_paste(text, filename=None):
     
-    filename = ''.join(random.choice(string.ascii_letters + string.digits + "-_") for _ in range(3))
-    
+    if filename == None:
+        filename = ''.join(random.choice(string.ascii_letters + string.digits + "-_") for _ in range(3))
+    else: 
+        filename = filename
+
     s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=text)
     return filename
 
@@ -219,13 +222,19 @@ def rename():
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    cookie = request.cookies.get("key")
+    if cookie == key:
+        return render_template('index_admin.html')
+
+    else: 
+        return render_template('index.html')
 
 
 @app.route('/submit', methods=['POST'])
 def submit():
     text = request.form.get('text')
-    return redirect(f"/{create_paste(text)}")
+    filename = request.form.get('filename')
+    return redirect(f"/{create_paste(text, filename)}", )
     
 
 @app.errorhandler(413)
