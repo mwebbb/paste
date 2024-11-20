@@ -73,6 +73,10 @@ def create_paste(text, filename=None):
         filename = ''.join(random.choice(string.ascii_letters + string.digits + "-_") for _ in range(3))
     else: 
         filename = filename
+        
+    if filename in badName:
+        filename = ''.join(random.choice(string.ascii_letters + string.digits + "-_") for _ in range(3))
+
 
     s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=text)
     return filename
@@ -234,7 +238,7 @@ def home():
 def submit():
     text = request.form.get('text')
     filename = request.form.get('filename')
-    return redirect(f"/{create_paste(text, filename)}", )
+    return redirect(f"/{create_paste(text, filename)}")
     
 
 @app.errorhandler(413)
