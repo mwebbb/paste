@@ -148,7 +148,7 @@ def auth():
         pw = request.form.get('key')
         if pw == key:
             resp = make_response(redirect('/panel'))
-            resp.set_cookie('key', pw, max_age=timedelta(hours=12))
+            resp.set_cookie('key', pw, max_age=timedelta(hours=72))
 
             return resp
         else:
