@@ -67,15 +67,9 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 256 * 1024
 
 
-def create_paste(text, filename=None):
-    
-    if filename == None:
-        filename = ''.join(random.choice(string.ascii_letters + string.digits + "-_") for _ in range(3))
-    else: 
-        filename = filename
-        
-    if filename in badName:
-        filename = ''.join(random.choice(string.ascii_letters + string.digits + "-_") for _ in range(3))
+def create_paste(text):
+            
+    filename = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(random.choice([3, 4])))
 
 
     s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=text)
@@ -208,7 +202,7 @@ def rename():
         newKey = request.form.get('newKey')
 
         if not newKey:
-            randomKey = ''.join(random.choice(string.ascii_letters + string.digits + "_-") for _ in range(random.choice([3, 4])))
+            randomKey = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(random.choice([3])))
             renameObject(oldKey, randomKey)
             return redirect(f'/manage?id={randomKey}')
         else:
@@ -226,20 +220,16 @@ def rename():
 
 @app.route('/')
 def home():
-    cookie = request.cookies.get("key")
-    if cookie == key:
-        return render_template('index_admin.html')
 
-    else: 
-        return render_template('index.html')
+    
+    return render_template('index.html')
 
 
 @app.route('/submit', methods=['POST'])
 def submit():
     text = request.form.get('text')
-    filename = request.form.get('filename')
     
-    return redirect(f"/{create_paste(text, filename=None)}")
+    return redirect(f"/{create_paste(text)}")
     
 
 @app.errorhandler(413)
