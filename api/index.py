@@ -238,7 +238,8 @@ def home():
 def submit():
     text = request.form.get('text')
     filename = request.form.get('filename')
-    return redirect(f"/{create_paste(text, filename)}")
+    
+    return redirect(f"/{create_paste(text, filename=None)}")
     
 
 @app.errorhandler(413)
