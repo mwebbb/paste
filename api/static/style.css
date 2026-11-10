@@ -689,18 +689,3 @@ code {
         align-items: stretch;
     }
 }
-
-/* keybind hint inside a button */
-.keyhint {
-    margin-left: 10px;
-    color: var(--faint);
-    transition: color 120ms;
-}
-
-button:hover .keyhint {
-    color: var(--muted);
-}
-
-button:disabled .keyhint {
-    display: none;
-}
