@@ -1,19 +1,26 @@
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>/auth</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% include "_head.html" %}
+    <title>deltabin / auth</title>
 </head>
 
-
-<body class="altStyle">
-
-    <h3>log in</h3>
-    <h6>{{ error }}</h6>
-
-    <form method="post" action="/auth">
-        <input name="key" type="password" placeholder="enter access key..." id="key"></input>
-        <button>enter</button>
-    </form>
-
+<body>
+    <main class="center">
+        <div class="card">
+            <div class="card-head">
+                <h1>auth</h1>
+                <a class="btn ghost" href="/">back</a>
+            </div>
+            <form class="card-body" method="post" action="/auth">
+                {% if error %}<div class="error">{{ error|lower }}</div>{% endif %}
+                <label class="label" for="key">access key</label>
+                <div class="row">
+                    <input name="key" type="password" id="key" autocomplete="current-password" autofocus required>
+                    <button class="primary" type="submit">enter</button>
+                </div>
+            </form>
+        </div>
+    </main>
 </body>
+</html>

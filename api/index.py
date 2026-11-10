@@ -1,243 +1,254 @@
-from flask import Flask, request, render_template, redirect, make_response, url_for, Response, jsonify
-import random
-import string
-import boto3
-import os
+import hashlib
+import hmac
 import json
-from botocore.exceptions import NoCredentialsError
+import os
+import re
+import secrets
 from datetime import timedelta
+from functools import wraps
 
-
-
-badName = ['auth','edit','logout', 'panel', 'manage','delete','submit','rename']
+import boto3
+from flask import Flask, Response, jsonify, make_response, redirect, render_template, request, url_for
 
 s3 = boto3.client(
-    's3',
-    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+    "s3",
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
 )
+BUCKET = os.getenv("AWS_S3_BUCKET_NAME")
+ADMIN_KEY = os.getenv("KEY")
 
-key = os.getenv('KEY')
+RESERVED = {"auth", "logout", "panel", "manage", "delete", "rename", "create", "tos",
+            "static", "api", "robots.txt", "favicon.ico"}
+NAME_RE = re.compile(r"^[a-zA-Z0-9_-]{1,16}$")
+ALPHABET = "abcdefghijklmnopqrstuvwxyz"
+MAX_BYTES = 256 * 1024
 
-BUCKET_NAME = os.getenv('AWS_S3_BUCKET_NAME')
+app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = MAX_BYTES
 
-def renameObject(old, new):
-    
-    s3.copy_object(
-        Bucket=BUCKET_NAME,
-        CopySource={'Bucket': BUCKET_NAME, 'Key': old},
-        Key=new
-    )
 
-    s3.delete_object(
-        Bucket=BUCKET_NAME,
-        Key=old
-    )   
+# ---------- storage ----------
 
-def listFiles():
-    s3 = boto3.client('s3')
-
-    file_names = []
-
-    response = s3.list_objects_v2(Bucket=BUCKET_NAME)
-
-    if 'Contents' in response:
-        
-        for obj in response['Contents']:
-            file_names.append(obj['Key'])
-
-    return file_names
-
-def listFiles2():
+def exists(name):
     try:
-        response = s3.list_objects_v2(Bucket=BUCKET_NAME)
-        files = response.get('Contents', [])
-        return files
-    except NoCredentialsError:
-        return []
-
-def validate(id):
-    if id in listFiles():
+        s3.head_object(Bucket=BUCKET, Key=name)
         return True
-    elif id not in listFiles():
+    except s3.exceptions.ClientError:
         return False
 
 
-
-app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 256 * 1024
-
-
-def create_paste(ct, iv):
-    filename = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(random.choice([3, 4])))
-    body = json.dumps({"ct": ct, "iv": iv})
-    s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=body, Metadata={"enc": "1"})
-    return filename
+def list_pastes():
+    out = []
+    for page in s3.get_paginator("list_objects_v2").paginate(Bucket=BUCKET):
+        for o in page.get("Contents", []):
+            out.append({"name": o["Key"], "size": o["Size"], "modified": o["LastModified"]})
+    out.sort(key=lambda p: p["modified"], reverse=True)
+    return out
 
 
-@app.route('/edit', methods=["GET", "POST"])
-def edit():
+def purge(names):
+    """Delete every stored version of each name, so nothing lingers in a versioned bucket."""
+    names = set(names)
+    if not names:
+        return
+    items = []
+    for name in names:
+        for page in s3.get_paginator("list_object_versions").paginate(Bucket=BUCKET, Prefix=name):
+            for v in page.get("Versions", []) + page.get("DeleteMarkers", []):
+                if v["Key"] == name:
+                    items.append({"Key": name, "VersionId": v["VersionId"]})
+    for i in range(0, len(items), 1000):
+        s3.delete_objects(Bucket=BUCKET, Delete={"Objects": items[i:i + 1000], "Quiet": True})
 
 
-    if request.method == "POST":
-        cookie = request.cookies.get("key")
-        if cookie == key:
-
-            
-            newText = request.form.get('text')
-            file_name = request.form.get('file_name')
-            s3.delete_object(Bucket=BUCKET_NAME, Key=file_name)
-            s3.put_object(Bucket=BUCKET_NAME, Key=file_name, Body=newText)
-
-            return redirect(f"/{file_name}")
-        
-        else:
-            return redirect("/auth")
-
-            
-    elif request.method == "GET":
-        cookie = request.cookies.get("key")
-        if cookie == key:
-
-            file_name = request.args.get('id')
-
-            if not file_name:
-                return "No file id provided!"
+def new_name():
+    for length in (4, 4, 4, 5, 6, 8):
+        name = "".join(secrets.choice(ALPHABET) for _ in range(length))
+        if name not in RESERVED and not exists(name):
+            return name
+    raise RuntimeError("could not allocate a name")
 
 
+# ---------- auth ----------
+
+def admin_token():
+    return hmac.new(ADMIN_KEY.encode(), b"deltabin-admin", hashlib.sha256).hexdigest()
 
 
-            response = s3.get_object(Bucket=BUCKET_NAME, Key=file_name)
-            content = response['Body'].read().decode('utf-8')
-            
-            return render_template('edit.html', oldtext=content)
+def is_admin():
+    cookie = request.cookies.get("session")
+    return bool(ADMIN_KEY and cookie and hmac.compare_digest(cookie, admin_token()))
 
 
-
-@app.route('/<id>')
-def paste(id):
-    if validate(id) == True:
-        try:
-            response = s3.get_object(Bucket=BUCKET_NAME, Key=id)
-            content = response['Body'].read().decode('utf-8')
-            if response['Metadata'].get('enc'):
-                return render_template('view.html', enc=True, payload=json.loads(content), id=id)
-            return render_template('view.html', id=id, enc=False, content=content)
-        except s3.exceptions.NoSuchKey:
-            return Response("404", mimetype='text/plain')
-        except Exception as e:
-            return f"Error: {str(e)}", 500
-    else:
-        return f"file {id} not found!"
+def admin_required(view):
+    @wraps(view)
+    def wrapper(*args, **kwargs):
+        if not is_admin():
+            return redirect(url_for("auth"))
+        return view(*args, **kwargs)
+    return wrapper
 
 
-@app.route('/auth', methods=["GET", "POST"])
-def auth():
-    if request.method == "GET":
-        pw = request.cookies.get('key')
-        if pw == key:
-            return redirect('/panel')
-        elif pw != key:
-            return render_template('auth.html')
-        
-    elif request.method == "POST":
-        pw = request.form.get('key')
-        if pw == key:
-            resp = make_response(redirect('/panel'))
-            resp.set_cookie('key', pw, max_age=timedelta(hours=72))
-
-            return resp
-        else:
-            return render_template("auth.html", error = "Incorrect key.")
-
-@app.route('/logout', methods=["GET"])
-def logout():
-    if request.method == "GET":
-        log_out = make_response(redirect('/'))
-        log_out.set_cookie('key', '', expires=0)
-        
-        return log_out
-    
-@app.route('/panel')
-def panel():
-    cookie = request.cookies.get('key')
-    if cookie == key:
-        return render_template('panel.html', files=listFiles2())
-    else:
-        return redirect('/auth')
+def message(code, text):
+    return render_template("message.html", code=code, message=text), code
 
 
-@app.route('/delete', methods=["POST"])
-def delete():
-    if request.method == "POST":
-        cookie = request.cookies.get('key')
-        if cookie == key:
-            file = request.form.get('toDelete')
-            s3.delete_object(Bucket=BUCKET_NAME, Key=file)
-            return redirect('/panel')
-        else:
-            return redirect('/auth')
+# ---------- filters / headers ----------
 
-@app.route('/manage')
-def manage():
-    cookie = request.cookies.get('key')
-    if cookie == key:
-        if request.args.get('id') == None:
-            return "Error: no file id provided! Please try again."
-        if validate(request.args.get('id')) == True:
-
-            file_key = request.args.get('id')
-            return render_template('manage.html', file_key=file_key)
-            
-        elif validate(request.args.get('id')) == False:
-            return Response("404", mimetype='text/plain')
-
-    else:
-        return redirect('/auth')
+@app.template_filter("size")
+def fmt_size(n):
+    if n < 1024:
+        return f"{n} b"
+    if n < 1024 * 1024:
+        return f"{n / 1024:.1f} kb"
+    return f"{n / 1024 / 1024:.1f} mb"
 
 
-@app.route('/rename', methods=["POST"])
-def rename():
-    cookie = request.cookies.get('key')
-    if cookie == key:
-        oldKey = request.form.get('oldKey')
-        newKey = request.form.get('newKey')
-
-        if not newKey:
-            randomKey = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(random.choice([3])))
-            renameObject(oldKey, randomKey)
-            return redirect(f'/manage?id={randomKey}')
-        else:
-            if newKey not in badName:
-                renameObject(oldKey, newKey)
-                return redirect(f'/manage?id={newKey}')
-            else:
-                return redirect(f"/manage?id={oldKey}")
-
-        
-    else:
-        return redirect('/auth')
-    
+@app.after_request
+def headers(resp):
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers["Referrer-Policy"] = "no-referrer"
+    resp.headers["X-Content-Type-Options"] = "nosniff"
+    resp.headers["X-Frame-Options"] = "DENY"
+    resp.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    resp.headers["Content-Security-Policy"] = (
+        "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+    )
+    return resp
 
 
-@app.route('/')
+# ---------- public ----------
+
+@app.route("/")
 def home():
-
-    
-    return render_template('index.html')
+    return render_template("index.html")
 
 
-@app.route('/create', methods=['POST'])
+@app.route("/create", methods=["POST"])
 def create():
     data = request.get_json(silent=True)
     if not data or not isinstance(data.get("ct"), str) or not isinstance(data.get("iv"), str):
         return Response("bad request", status=400, mimetype="text/plain")
-    return jsonify(id=create_paste(data["ct"], data["iv"]))    
+    name = new_name()
+    body = json.dumps({"ct": data["ct"], "iv": data["iv"]})
+    s3.put_object(Bucket=BUCKET, Key=name, Body=body, Metadata={"enc": "1"}, ContentType="application/json")
+    return jsonify(id=name)
+
+
+@app.route("/tos")
+def tos():
+    return render_template("tos.html")
+
+
+@app.route("/robots.txt")
+def robots():
+    return Response("User-agent: *\nDisallow: /\n", mimetype="text/plain")
+
+
+@app.route("/<name>")
+def paste(name):
+    try:
+        obj = s3.get_object(Bucket=BUCKET, Key=name)
+        payload = json.loads(obj["Body"].read())
+        if not isinstance(payload, dict) or "ct" not in payload:
+            raise ValueError
+    except s3.exceptions.NoSuchKey:
+        return message(404, "paste not found")
+    except ValueError:
+        return message(500, "this paste is unreadable")
+    return render_template("view.html", id=name, payload=payload)
+
+
+# ---------- admin ----------
+
+@app.route("/auth", methods=["GET", "POST"])
+def auth():
+    if is_admin():
+        return redirect(url_for("panel"))
+    if request.method == "GET":
+        return render_template("auth.html")
+    entered = request.form.get("key", "")
+    if not ADMIN_KEY or not hmac.compare_digest(entered.encode(), ADMIN_KEY.encode()):
+        return render_template("auth.html", error="incorrect key"), 401
+    resp = make_response(redirect(url_for("panel")))
+    resp.set_cookie("session", admin_token(), max_age=timedelta(hours=72),
+                    httponly=True, secure=request.is_secure, samesite="Strict")
+    return resp
+
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    resp = make_response(redirect("/"))
+    resp.delete_cookie("session")
+    return resp
+
+
+@app.route("/panel")
+@admin_required
+def panel():
+    pastes = list_pastes()
+    return render_template("panel.html", pastes=pastes, total=sum(p["size"] for p in pastes),
+                           flash=request.args.get("msg"))
+
+
+@app.route("/manage")
+@admin_required
+def manage():
+    name = request.args.get("id", "")
+    try:
+        head = s3.head_object(Bucket=BUCKET, Key=name)
+    except s3.exceptions.ClientError:
+        return message(404, "paste not found")
+    return render_template("manage.html", id=name, size=head["ContentLength"],
+                           modified=head["LastModified"], error=request.args.get("err"))
+
+
+@app.route("/delete", methods=["POST"])
+@admin_required
+def delete():
+    names = [n for n in request.form.getlist("name") if n]
+    purge(names)
+    n = len(names)
+    return redirect(url_for("panel", msg=f"deleted {n} paste{'' if n == 1 else 's'}"))
+
+
+@app.route("/rename", methods=["POST"])
+@admin_required
+def rename():
+    old = request.form.get("old", "")
+    new = request.form.get("new", "").strip() or new_name()
+    if not exists(old):
+        return message(404, "paste not found")
+    if not NAME_RE.match(new) or new in RESERVED:
+        return redirect(url_for("manage", id=old, err="invalid name"))
+    if new != old and exists(new):
+        return redirect(url_for("manage", id=old, err="name taken"))
+    if new != old:
+        s3.copy_object(Bucket=BUCKET, CopySource={"Bucket": BUCKET, "Key": old}, Key=new)
+        purge([old])
+    return redirect(url_for("panel", msg=f"renamed {old} → {new}"))
+
+
+# ---------- errors ----------
 
 @app.errorhandler(413)
-def request_entity_too_large(error):
-    return "Error: File too large. Maximum allowed size is 256KB.", 413
+def too_large(_):
+    if request.path == "/create":
+        return Response("too large", status=413, mimetype="text/plain")
+    return message(413, "too large. 256 kb max.")
 
 
-if __name__ == '__main__':
-    app.run(debug=True, port="8080")
+@app.errorhandler(404)
+def not_found(_):
+    return message(404, "page not found")
+
+
+@app.errorhandler(500)
+def server_error(_):
+    return message(500, "something went wrong")
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=8080)

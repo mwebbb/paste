@@ -1,51 +1,160 @@
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>/panel</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+    {% include "_head.html" %}
+    <title>deltabin / panel</title>
 </head>
 
-<body class="altStyle">
-    <div>
-        <h3>admin panel</h3>
-        <div>
-            <form action="/delete" method="POST">
-                <input type="text" name="toDelete" placeholder="file name..."></input>
-                <button type="submit">delete</button>
-            </form>
-        </div>
-        <div id="files" style="margin: auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>name</th>
-                        <th>size</th>
-                        <th>manage</th>
-                        <th>delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for file in files %}
-                    <tr>
-                        <td>
-                            <a href="{{ url_for('paste', id=file['Key']) }}" target="_blank">{{ file['Key'] }}</a>
-                        </td>
-                        <td>{{ file['Size'] }}B</td>
-                        <td><a href="{{ url_for('manage', id=file['Key']) }}"><button>manage</button></a></td>
-                        <td><form action="/delete" method="POST" style="margin: 0px;"><input type="hidden" value="{{ file['Key'] }}" name="toDelete"><button type="submit">delete</button></form></td>
+<body>
+    <main class="page">
+        <header class="bar">
+            <div class="brand">
+                <a class="name" href="/">deltabin</a>
+                <span class="crumb">panel</span>
+            </div>
+            <nav class="actions">
+                <a class="btn ghost" href="/">new paste</a>
+                <form action="/logout" method="post">
+                    <button class="ghost" type="submit">log out</button>
+                </form>
+            </nav>
+        </header>
 
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            
-        </div>
-        <div class="button-container">
-            <a href="/" style="text-decoration: none;"><button>home</button></a>
-            <form action="/logout" style="margin: 0px; margin-top: 7px;">
-                <button class="danger">log out</button>
-            </form>
-        </div>
-    </div>
+        {% if flash %}<div class="flash" id="flash">{{ flash }}</div>{% endif %}
+
+        <section class="stats">
+            <div class="stat"><span class="label">pastes</span><span class="value">{{ pastes|length }}</span></div>
+            <div class="stat"><span class="label">storage</span><span class="value">{{ total|size }}</span></div>
+            <div class="stat"><span class="label">last 24h</span><span class="value" id="recent">&ndash;</span></div>
+            <div class="stat"><span class="label">newest</span><span class="value" id="newest">&ndash;</span></div>
+        </section>
+
+        <form class="card" id="listForm" action="/delete" method="post">
+            <div class="toolbar">
+                <label class="check">
+                    <input type="checkbox" id="selectAll">
+                </label>
+                <input id="filter" type="search" placeholder="filter" autocomplete="off" spellcheck="false">
+                <span class="muted hide-sm" id="count"></span>
+                <button id="bulkDelete" class="danger" type="submit" disabled>delete</button>
+            </div>
+
+            {% if pastes %}
+            <div class="table-wrap">
+                <table id="table">
+                    <thead>
+                        <tr>
+                            <th class="check-col"></th>
+                            <th><button type="button" class="sort" data-key="name">name</button></th>
+                            <th class="num"><button type="button" class="sort" data-key="size">size</button></th>
+                            <th class="num"><button type="button" class="sort active desc" data-key="ts">age</button></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in pastes %}
+                        <tr data-name="{{ p.name }}" data-size="{{ p.size }}" data-ts="{{ p.modified.timestamp()|int }}">
+                            <td class="check-col"><label class="check"><input type="checkbox" name="name" value="{{ p.name }}"></label></td>
+                            <td class="name-col"><a href="{{ url_for('manage', id=p.name) }}">{{ p.name }}</a></td>
+                            <td class="num">{{ p.size|size }}</td>
+                            <td class="num age" title="{{ p.modified.strftime('%Y-%m-%d %H:%M UTC') }}"></td>
+                            <td class="act"><a class="btn ghost" href="{{ url_for('manage', id=p.name) }}">manage</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="empty" id="noMatch" hidden>no matches</div>
+            </div>
+            {% else %}
+            <div class="empty">no pastes</div>
+            {% endif %}
+        </form>
+    </main>
+
+    <script>
+    const rows = [...document.querySelectorAll("#table tbody tr")];
+    const tbody = document.querySelector("#table tbody");
+    const filter = document.getElementById("filter");
+    const selectAll = document.getElementById("selectAll");
+    const bulk = document.getElementById("bulkDelete");
+    const count = document.getElementById("count");
+    const now = Date.now() / 1000;
+
+    function ago(s) {
+        const d = now - s;
+        if (d < 60) return "now";
+        if (d < 3600) return Math.floor(d / 60) + "m";
+        if (d < 86400) return Math.floor(d / 3600) + "h";
+        if (d < 86400 * 30) return Math.floor(d / 86400) + "d";
+        if (d < 86400 * 365) return Math.floor(d / 86400 / 30) + "mo";
+        return Math.floor(d / 86400 / 365) + "y";
+    }
+
+    rows.forEach(r => r.querySelector(".age").textContent = ago(+r.dataset.ts));
+    document.getElementById("recent").textContent = rows.filter(r => now - r.dataset.ts < 86400).length;
+    if (rows.length) document.getElementById("newest").textContent = ago(Math.max(...rows.map(r => +r.dataset.ts)));
+
+    const visible = () => rows.filter(r => !r.hidden);
+    const boxes = (list) => list.map(r => r.querySelector("input[type=checkbox]"));
+
+    function refresh() {
+        const sel = boxes(rows).filter(b => b.checked).length;
+        const vis = visible();
+        bulk.disabled = sel === 0;
+        bulk.textContent = sel ? "delete " + sel : "delete";
+        count.textContent = vis.length + " / " + rows.length;
+        const visChecked = boxes(vis).filter(b => b.checked).length;
+        selectAll.checked = vis.length > 0 && visChecked === vis.length;
+        selectAll.indeterminate = visChecked > 0 && visChecked < vis.length;
+        const nm = document.getElementById("noMatch");
+        if (nm) nm.hidden = vis.length > 0;
+        rows.forEach(r => r.classList.toggle("selected", r.querySelector("input").checked));
+    }
+
+    filter.addEventListener("input", () => {
+        const q = filter.value.trim().toLowerCase();
+        rows.forEach(r => {
+            r.hidden = q && !r.dataset.name.toLowerCase().includes(q);
+            if (r.hidden) r.querySelector("input").checked = false;
+        });
+        refresh();
+    });
+
+    selectAll.addEventListener("change", () => {
+        boxes(visible()).forEach(b => b.checked = selectAll.checked);
+        refresh();
+    });
+
+    tbody && tbody.addEventListener("change", refresh);
+
+    document.getElementById("listForm").addEventListener("submit", (e) => {
+        const n = boxes(rows).filter(b => b.checked).length;
+        if (!n || !confirm("permanently delete " + n + " paste" + (n === 1 ? "" : "s") + "?")) e.preventDefault();
+    });
+
+    document.querySelectorAll(".sort").forEach(btn => btn.addEventListener("click", () => {
+        const key = btn.dataset.key;
+        const desc = btn.classList.contains("active") ? !btn.classList.contains("desc") : key !== "name";
+        document.querySelectorAll(".sort").forEach(b => b.classList.remove("active", "desc"));
+        btn.classList.add("active");
+        btn.classList.toggle("desc", desc);
+        const val = r => key === "name" ? r.dataset.name : +r.dataset[key];
+        rows.sort((a, b) => (val(a) > val(b) ? 1 : val(a) < val(b) ? -1 : 0) * (desc ? -1 : 1));
+        rows.forEach(r => tbody.appendChild(r));
+    }));
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "/" && document.activeElement !== filter) { e.preventDefault(); filter.focus(); }
+        if (e.key === "Escape" && document.activeElement === filter) { filter.value = ""; filter.dispatchEvent(new Event("input")); filter.blur(); }
+    });
+
+    const fl = document.getElementById("flash");
+    if (fl) {
+        history.replaceState(null, "", "/panel");
+        setTimeout(() => fl.classList.add("fade"), 3000);
+    }
+
+    refresh();
+    </script>
 </body>
+</html>

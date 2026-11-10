@@ -1,77 +1,74 @@
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>fatal</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
-
-    <style>
-    body {
-        background-color: black;
-        color: white;
-        font-family: "Geist Mono";
-        padding-left: 1%;
-        text-align: left;
-        font-size: 20px;
-    }
-
-    .submit,
-    strong {
-        font-size: 15px;
-    }
-
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .button-container {
-        display: flex;
-        gap: 10px;
-    }
-
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-</style>
+    {% include "_head.html" %}
+    <title>deltabin / {{ id }}</title>
 </head>
 
 <body>
-    <div class="header">
-        <h4>{{ id }}</h4>
+    <div class="shell">
+        <header class="bar">
+            <div class="brand">
+                <a class="name" href="/">deltabin</a>
+                <span class="crumb">{{ id }}</span>
+                <span class="tag">e2e</span>
+            </div>
+            <nav class="actions">
+                <button id="linkButton" class="ghost hide-sm" type="button">copy link</button>
+                <button id="downloadButton" class="ghost hide-sm" type="button" disabled>download</button>
+                <button id="copyButton" type="button" disabled>copy</button>
+                <a class="btn" href="/">new</a>
+            </nav>
+        </header>
 
-        <div class="button-container" style="margin-right: 2%">
-        <button id="copyButton" type="button">copy</button>
-    </div>
+        <div id="notice" class="notice" hidden>
+            <span>saved</span>
+            <button id="noticeCopy" class="primary" type="button">copy link</button>
+        </div>
 
+        <textarea id="text" readonly spellcheck="false" autocomplete="off" placeholder="decrypting..."
+            data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false"></textarea>
+
+        <footer class="bar bottom">
+            <span class="muted" id="status"></span>
+        </footer>
     </div>
-    <form>
-        <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false" data-gramm="false" data-gramm_editor="false" readonly="true" disabled data-enable-grammarly="false">{% if not enc %}{{ content }}{% endif %}</textarea>
-    </form>
 
     <script>
-document.getElementById("copyButton").addEventListener("click", async () => {
-    const btn = document.getElementById("copyButton");
-    try {
-        await navigator.clipboard.writeText(document.getElementById("text").value);
-        btn.textContent = "copied";
-    } catch (e) {
-        btn.textContent = "failed";
+    const ID = {{ id|tojson }};
+    const box = document.getElementById("text");
+    const status = document.getElementById("status");
+
+    function flash(btn, msg) {
+        const orig = btn.dataset.label || (btn.dataset.label = btn.textContent);
+        btn.textContent = msg;
+        clearTimeout(btn._t);
+        btn._t = setTimeout(() => { btn.textContent = orig; }, 1400);
     }
-    setTimeout(() => { btn.textContent = "copy"; }, 1500);
-});
-</script>
 
-    {% if enc %}
-    <script>
+    async function copy(btn, value) {
+        try { await navigator.clipboard.writeText(value); flash(btn, "copied"); }
+        catch { flash(btn, "failed"); }
+    }
+
+    document.getElementById("copyButton").onclick = (e) => copy(e.target, box.value);
+    document.getElementById("linkButton").onclick = (e) => copy(e.target, location.href);
+    document.getElementById("noticeCopy").onclick = (e) => copy(e.target, location.href);
+    document.getElementById("downloadButton").onclick = () => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([box.value], { type: "text/plain" }));
+        a.download = ID + ".txt";
+        a.click();
+        URL.revokeObjectURL(a.href);
+    };
+
+    try {
+        if (sessionStorage.getItem("fresh") === ID) {
+            sessionStorage.removeItem("fresh");
+            document.getElementById("notice").hidden = false;
+        }
+    } catch {}
+
     function unb64(s) {
         s = s.replace(/-/g, "+").replace(/_/g, "/");
         return Uint8Array.from(atob(s), c => c.charCodeAt(0));
@@ -85,13 +82,21 @@ document.getElementById("copyButton").addEventListener("click", async () => {
 
     (async () => {
         const payload = {{ payload|tojson }};
-        const box = document.getElementById("text");
+        const keyStr = location.hash.slice(1);
         try {
-            box.value = await decryptPaste(payload.ct, payload.iv, location.hash.slice(1));
+            if (!keyStr) throw new Error("nokey");
+            box.value = await decryptPaste(payload.ct, payload.iv, keyStr);
+            const lines = box.value.split("\n").length;
+            status.textContent = lines + (lines === 1 ? " line" : " lines") + " · " + box.value.length + " chars";
+            document.getElementById("copyButton").disabled = false;
+            document.getElementById("downloadButton").disabled = false;
         } catch (e) {
-            box.value = "could not decrypt. the link is probably missing the part after the #";
+            box.placeholder = e.message === "nokey"
+                ? "missing key"
+                : "wrong key";
+            status.textContent = "locked";
         }
     })();
     </script>
-    {% endif %}</body>
-
+</body>
+</html>

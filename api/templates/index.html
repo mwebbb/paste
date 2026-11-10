@@ -1,86 +1,62 @@
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include "_head.html" %}
     <title>deltabin</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-    <div class="header">
-        <h3 class="title">deltabin</h3>
-        <div class="button-container" style="margin-right: 2%">
-            <a href="/tos" target="_blank"><button>tos</button></a>
-            <a href="/auth"><button>auth</button></a>
-        </div>
+    <div class="shell">
+        <header class="bar">
+            <div class="brand">
+                <a class="name" href="/">deltabin</a>
+                <span class="tag">e2e</span>
+            </div>
+            <nav class="actions">
+                <a class="btn ghost" href="/tos" target="_blank" rel="noopener">tos</a>
+                <a class="btn ghost" href="/auth">auth</a>
+            </nav>
+        </header>
+
+        <form class="paste-form" id="pasteForm">
+            <textarea placeholder="paste something..." id="text" name="text" required autofocus spellcheck="false"
+                autocomplete="off" autocorrect="off" autocapitalize="off"
+                data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false"></textarea>
+
+            <div class="bar bottom">
+                <span class="muted" id="status"></span>
+                <div class="actions">
+                    <button id="createButton" class="primary" type="submit">encrypt &amp; save</button>
+                </div>
+            </div>
+        </form>
     </div>
-    <form>
-        <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false"
-            data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false"></textarea>
-        <h3><button id="createButton" class="submit" type="submit"><strong>submit</strong></button></h3>
 
-    </form>
-</body>
+    <script>
+    const text = document.getElementById("text");
+    const form = document.getElementById("pasteForm");
+    const btn = document.getElementById("createButton");
+    const status = document.getElementById("status");
 
-<style>
-    body {
-        background-color: black;
-        color: white;
-        font-family: mono, monospace;
-        padding-left: 1%;
-        text-align: left;
-        font-size: 20px;
-    }
-
-    .submit,
-    strong {
-        font-size: 15px;
-    }
-
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .button-container {
-        display: flex;
-        gap: 10px;
-    }
-
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-</style>
-
-<script>
-
-    var inputField = document.getElementById('text');
-
-    inputField.onkeydown = function (e) {
-
-        if (e.keyCode === 9) {
-
-            this.setRangeText(
-
-                '    ',
-
-                this.selectionStart,
-
-                this.selectionStart,
-
-                'end'
-
-            )
-
-            return false;
+    text.addEventListener("keydown", (e) => {
+        if (e.key === "Tab") {
+            e.preventDefault();
+            text.setRangeText("    ", text.selectionStart, text.selectionEnd, "end");
+        } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            form.requestSubmit();
         }
+    });
 
-    };
-
-
+    text.addEventListener("input", () => {
+        const n = text.value.length;
+        const bytes = new TextEncoder().encode(text.value).length;
+        // base64 + json overhead: ~4/3 of the plaintext must fit in 256 kb
+        const over = bytes * 4 / 3 + 200 > 256 * 1024;
+        status.textContent = !n ? ""
+            : over ? "too large" : n + " chars";
+        btn.disabled = over;
+    });
 
     function b64(buf) {
         let s = "";
@@ -95,18 +71,28 @@
         return { ct: b64(ct), iv: b64(iv), key: b64(await crypto.subtle.exportKey("raw", key)) };
     }
 
-    document.querySelector("form").addEventListener("submit", async (e) => {
+    form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const text = document.getElementById("text").value;
-        const { ct, iv, key } = await encryptPaste(text);
-        const res = await fetch("/create", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ct, iv })
-        });
-        const { id } = await res.json();
-        window.location.href = "/" + id + "#" + key;
+        if (!text.value) return;
+        btn.disabled = true;
+        btn.textContent = "encrypting...";
+        try {
+            const { ct, iv, key } = await encryptPaste(text.value);
+            const res = await fetch("/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ct, iv })
+            });
+            if (!res.ok) throw new Error(res.status === 413 ? "too large" : "upload failed");
+            const { id } = await res.json();
+            try { sessionStorage.setItem("fresh", id); } catch {}
+            window.location.href = "/" + id + "#" + key;
+        } catch (err) {
+            status.textContent = "error: " + err.message;
+            btn.disabled = false;
+            btn.textContent = "encrypt & save";
+        }
     });
-
-
-</script>
+    </script>
+</body>
+</html>

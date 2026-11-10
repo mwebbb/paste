@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {% include "_head.html" %}
+    <title>deltabin / terms</title>
+</head>
+
+<body>
+    <main class="page narrow">
+        <header class="bar">
+            <div class="brand">
+                <a class="name" href="/">deltabin</a>
+                <span class="crumb">terms</span>
+            </div>
+            <nav class="actions">
+                <a class="btn ghost" href="/">new paste</a>
+            </nav>
+        </header>
+
+        <article class="prose">
+            <h2>how it works</h2>
+            <p>pastes are encrypted in your browser with aes-256-gcm before they are uploaded. the key is put in the part of the link after <code>#</code>, which browsers never send to the server. the server stores only ciphertext and cannot read your paste.</p>
+            <p>this means if you lose the link, the paste is gone. nobody can recover it.</p>
+
+            <h2>what is stored</h2>
+            <p>the encrypted paste, its size, and when it was created. no accounts, no analytics, no cookies for visitors. standard hosting logs may record requests.</p>
+
+            <h2>rules</h2>
+            <ul>
+                <li>don't use this for anything illegal.</li>
+                <li>don't use it to host malware or to harass people.</li>
+                <li>pastes are limited to 256 kb.</li>
+            </ul>
+
+            <h2>removal</h2>
+            <p>any paste can be deleted at any time, for any reason, without notice. if you send a full link reporting abuse, it may be opened and removed.</p>
+
+            <h2>no warranty</h2>
+            <p>this service is provided as is. don't rely on it as your only copy of anything.</p>
+        </article>
+    </main>
+</body>
+</html>

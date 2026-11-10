@@ -1,38 +1,41 @@
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>/manage</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+    {% include "_head.html" %}
+    <title>deltabin / {{ id }}</title>
 </head>
 
 <body>
+    <main class="center">
+        <div class="card">
+            <div class="card-head">
+                <div class="brand">
+                    <a class="name" href="/panel">panel</a>
+                    <span class="crumb">{{ id }}</span>
+                </div>
+                <a class="btn ghost" href="/panel">back</a>
+            </div>
 
+            <dl class="meta">
+                <dt>size</dt><dd>{{ size|size }}</dd>
+                <dt>created</dt><dd>{{ modified.strftime('%Y-%m-%d %H:%M UTC') }}</dd>
+            </dl>
 
-    <div class="editor">
-        <h3 style="text-align: center;">viewing file: {{ request.args.get('id') }}</h3>
-        <div style="justify-content: center; display: flex; gap: 10px;">
-            <a href="{{ url_for('paste', id=request.args.get('id')) }}" target="_blank"><button>view</button></a>
-            <a href="{{ url_for('edit', id=request.args.get('id')) }}"><button>edit</button></a>
-            <form action="/delete" method="POST" style="display: inline;">
-                <input type="hidden" name="toDelete" value="{{ request.args.get('id') }}">
+            <div class="card-body">
+                {% if error %}<div class="error">{{ error }}</div>{% endif %}
+                <label class="label" for="new">rename</label>
+                <form class="row" action="/rename" method="post">
+                    <input type="hidden" name="old" value="{{ id }}">
+                    <input id="new" name="new" placeholder="new name" maxlength="16" pattern="[a-zA-Z0-9_\-]{1,16}" autocomplete="off" spellcheck="false">
+                    <button type="submit">rename</button>
+                </form>
+            </div>
+
+            <form class="card-foot" action="/delete" method="post" onsubmit="return confirm('permanently delete this paste?')">
+                <input type="hidden" name="name" value="{{ id }}">
                 <button class="danger" type="submit">delete</button>
             </form>
         </div>
-
-        <form action="/rename" method="POST" style="display:flex; gap: 10px; justify-content: center;">
-            <input type="hidden" name="oldKey" value="{{ request.args.get('id') }}">
-            <input placeholder="new name..." maxlength="16" pattern="[a-zA-Z0-9_-]{1,16}" name="newKey">
-            <button>rename</button>
-        </form>
-    
-        <div style="justify-content: center; display: flex; gap: 10px;">
-            <a href="/panel"><button>back</button></a>
-        </div>
-    </div>
-
-
-    </div>
-
-
+    </main>
 </body>
+</html>
