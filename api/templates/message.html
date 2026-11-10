@@ -1,11 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-    {% include "_head.html" %}
-    <title>deltabin / {{ code }}</title>
-</head>
-
-<body>
+{% extends "base.html" %}
+{% block title %} / {{ code }}{% endblock %}
+{% block page %}message{% endblock %}
+{% block body %}
     <main class="center">
         <div class="card">
             <div class="card-head">
@@ -18,5 +14,4 @@
             </div>
         </div>
     </main>
-</body>
-</html>
+{% endblock %}

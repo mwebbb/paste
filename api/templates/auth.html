@@ -1,11 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-    {% include "_head.html" %}
-    <title>deltabin / auth</title>
-</head>
-
-<body>
+{% extends "base.html" %}
+{% block title %} / auth{% endblock %}
+{% block page %}auth{% endblock %}
+{% block body %}
     <main class="center">
         <div class="card">
             <div class="card-head">
@@ -22,5 +18,4 @@
             </form>
         </div>
     </main>
-</body>
-</html>
+{% endblock %}

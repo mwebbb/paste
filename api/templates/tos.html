@@ -1,11 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-    {% include "_head.html" %}
-    <title>deltabin / terms</title>
-</head>
-
-<body>
+{% extends "base.html" %}
+{% block title %} / terms{% endblock %}
+{% block page %}tos{% endblock %}
+{% block body %}
     <main class="page narrow">
         <header class="bar">
             <div class="brand">
@@ -39,5 +35,4 @@
             <p>this service is provided as is. don't rely on it as your only copy of anything.</p>
         </article>
     </main>
-</body>
-</html>
+{% endblock %}

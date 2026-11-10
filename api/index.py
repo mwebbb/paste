@@ -8,6 +8,7 @@ from datetime import timedelta
 from functools import wraps
 
 import boto3
+from flask_limiter import Limiter
 from flask import Flask, Response, jsonify, make_response, redirect, render_template, request, url_for
 
 s3 = boto3.client(
@@ -20,6 +21,8 @@ ADMIN_KEY = os.getenv("KEY")
 
 RESERVED = {"auth", "logout", "panel", "manage", "delete", "rename", "create", "tos",
             "static", "api", "robots.txt", "favicon.ico"}
+
+
 NAME_RE = re.compile(r"^[a-zA-Z0-9_-]{1,16}$")
 ALPHABET = "abcdefghijklmnopqrstuvwxyz"
 MAX_BYTES = 256 * 1024
@@ -113,7 +116,7 @@ def headers(resp):
     resp.headers["X-Frame-Options"] = "DENY"
     resp.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
     resp.headers["Content-Security-Policy"] = (
-        "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
+        "default-src 'self'; script-src 'self'; style-src 'self'; "
         "img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
     )
     return resp

@@ -1,11 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-    {% include "_head.html" %}
-    <title>deltabin / {{ id }}</title>
-</head>
-
-<body>
+{% extends "base.html" %}
+{% block title %} / {{ id }}{% endblock %}
+{% block page %}manage{% endblock %}
+{% block body %}
     <main class="center">
         <div class="card">
             <div class="card-head">
@@ -31,11 +27,10 @@
                 </form>
             </div>
 
-            <form class="card-foot" action="/delete" method="post" onsubmit="return confirm('permanently delete this paste?')">
+            <form class="card-foot" action="/delete" method="post" data-confirm="permanently delete this paste?">
                 <input type="hidden" name="name" value="{{ id }}">
                 <button class="danger" type="submit">delete</button>
             </form>
         </div>
     </main>
-</body>
-</html>
+{% endblock %}

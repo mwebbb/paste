@@ -1,11 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-    {% include "_head.html" %}
-    <title>deltabin / {{ id }}</title>
-</head>
-
-<body>
+{% extends "base.html" %}
+{% block title %} / {{ id }}{% endblock %}
+{% block page %}view{% endblock %}
+{% block body %}
     <div class="shell">
         <header class="bar">
             <div class="brand">
@@ -34,69 +30,5 @@
         </footer>
     </div>
 
-    <script>
-    const ID = {{ id|tojson }};
-    const box = document.getElementById("text");
-    const status = document.getElementById("status");
-
-    function flash(btn, msg) {
-        const orig = btn.dataset.label || (btn.dataset.label = btn.textContent);
-        btn.textContent = msg;
-        clearTimeout(btn._t);
-        btn._t = setTimeout(() => { btn.textContent = orig; }, 1400);
-    }
-
-    async function copy(btn, value) {
-        try { await navigator.clipboard.writeText(value); flash(btn, "copied"); }
-        catch { flash(btn, "failed"); }
-    }
-
-    document.getElementById("copyButton").onclick = (e) => copy(e.target, box.value);
-    document.getElementById("linkButton").onclick = (e) => copy(e.target, location.href);
-    document.getElementById("noticeCopy").onclick = (e) => copy(e.target, location.href);
-    document.getElementById("downloadButton").onclick = () => {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(new Blob([box.value], { type: "text/plain" }));
-        a.download = ID + ".txt";
-        a.click();
-        URL.revokeObjectURL(a.href);
-    };
-
-    try {
-        if (sessionStorage.getItem("fresh") === ID) {
-            sessionStorage.removeItem("fresh");
-            document.getElementById("notice").hidden = false;
-        }
-    } catch {}
-
-    function unb64(s) {
-        s = s.replace(/-/g, "+").replace(/_/g, "/");
-        return Uint8Array.from(atob(s), c => c.charCodeAt(0));
-    }
-
-    async function decryptPaste(ct, iv, keyStr) {
-        const key = await crypto.subtle.importKey("raw", unb64(keyStr), "AES-GCM", false, ["decrypt"]);
-        const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(iv) }, key, unb64(ct));
-        return new TextDecoder().decode(pt);
-    }
-
-    (async () => {
-        const payload = {{ payload|tojson }};
-        const keyStr = location.hash.slice(1);
-        try {
-            if (!keyStr) throw new Error("nokey");
-            box.value = await decryptPaste(payload.ct, payload.iv, keyStr);
-            const lines = box.value.split("\n").length;
-            status.textContent = lines + (lines === 1 ? " line" : " lines") + " · " + box.value.length + " chars";
-            document.getElementById("copyButton").disabled = false;
-            document.getElementById("downloadButton").disabled = false;
-        } catch (e) {
-            box.placeholder = e.message === "nokey"
-                ? "missing key"
-                : "wrong key";
-            status.textContent = "locked";
-        }
-    })();
-    </script>
-</body>
-</html>
+    <script type="application/json" id="payload">{{ {"id": id, "ct": payload.ct, "iv": payload.iv}|tojson }}</script>
+{% endblock %}
