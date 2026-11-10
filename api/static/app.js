@@ -37,8 +37,8 @@ function flash(btn, msg) {
 }
 
 async function copy(btn, value) {
-    try { await navigator.clipboard.writeText(value); flash(btn, "copied"); }
-    catch { flash(btn, "failed"); }
+    try { await navigator.clipboard.writeText(value); flash(btn, "Copied"); }
+    catch { flash(btn, "Failed"); }
 }
 
 function store(fn) {
@@ -83,7 +83,7 @@ const pages = {
             const n = text.value.length;
             // base64 + json overhead: ~4/3 of the plaintext must fit in the request limit
             const over = new TextEncoder().encode(text.value).length * 4 / 3 + 200 > MAX_BYTES;
-            status.textContent = !n ? "" : over ? "too large" : n + " chars";
+            status.textContent = !n ? "" : over ? "Too large" : n + " chars";
             btn.disabled = saving || over;
         });
 
@@ -93,7 +93,7 @@ const pages = {
             if (saving || !text.value) return;
             saving = true;
             btn.disabled = true;
-            btn.textContent = "saving...";
+            btn.textContent = "Saving…";
             try {
                 const { ct, iv, key } = await encrypt(text.value);
                 const res = await fetch("/create", {
@@ -102,16 +102,16 @@ const pages = {
                     body: JSON.stringify({ ct, iv }),
                 });
                 if (!res.ok) {
-                    throw new Error({ 413: "too large", 429: "slow down" }[res.status] || "upload failed");
+                    throw new Error({ 413: "Too large", 429: "Slow down, try again shortly" }[res.status] || "Upload failed");
                 }
                 const { id } = await res.json();
                 store(s => s.setItem("fresh", id));
                 location.href = "/" + id + "#" + key;
             } catch (err) {
-                status.textContent = "error: " + err.message;
+                status.textContent = err.message;
                 saving = false;
                 btn.disabled = false;
-                btn.textContent = "save";
+                btn.textContent = "Save";
             }
         });
     },
@@ -122,6 +122,15 @@ const pages = {
         const status = $("#status");
         const copyBtn = $("#copyButton");
         const dlBtn = $("#downloadButton");
+
+        // ctrl/cmd+a anywhere selects only the paste, not the page chrome
+        document.addEventListener("keydown", (e) => {
+            if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "a") {
+                e.preventDefault();
+                box.focus();
+                box.select();
+            }
+        });
 
         copyBtn.onclick = (e) => copy(e.target, box.value);
         $("#linkButton").onclick = (e) => copy(e.target, location.href);
@@ -141,15 +150,15 @@ const pages = {
 
         const keyStr = location.hash.slice(1);
         if (!keyStr) {
-            box.placeholder = "missing key";
-            status.textContent = "locked";
+            box.placeholder = "Missing key";
+            status.textContent = "Locked";
             return;
         }
         try {
             box.value = await decrypt(data.ct, data.iv, keyStr);
         } catch {
-            box.placeholder = "wrong key";
-            status.textContent = "locked";
+            box.placeholder = "Wrong key";
+            status.textContent = "Locked";
             return;
         }
         const lines = box.value.split("\n").length;
@@ -177,7 +186,7 @@ const pages = {
             const vis = visible();
             const visSel = checked(vis).length;
             bulk.disabled = sel === 0;
-            bulk.textContent = sel ? "delete " + sel : "delete";
+            bulk.textContent = sel ? "Delete " + sel : "Delete";
             $("#count").textContent = vis.length + " / " + rows.length;
             selectAll.checked = vis.length > 0 && visSel === vis.length;
             selectAll.indeterminate = visSel > 0 && visSel < vis.length;
@@ -204,7 +213,7 @@ const pages = {
 
         $("#listForm").addEventListener("submit", (e) => {
             const n = checked(rows).length;
-            if (!n || !confirm("permanently delete " + n + " paste" + (n === 1 ? "" : "s") + "?")) e.preventDefault();
+            if (!n || !confirm("Permanently delete " + n + " paste" + (n === 1 ? "" : "s") + "?")) e.preventDefault();
         });
 
         $$(".sort").forEach(btn => btn.addEventListener("click", () => {

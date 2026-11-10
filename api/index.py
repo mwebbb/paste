@@ -9,6 +9,8 @@ from functools import wraps
 
 import boto3
 from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
 from flask import Flask, Response, jsonify, make_response, redirect, render_template, request, url_for
 
 s3 = boto3.client(
@@ -18,6 +20,8 @@ s3 = boto3.client(
 )
 BUCKET = os.getenv("AWS_S3_BUCKET_NAME")
 ADMIN_KEY = os.getenv("KEY")
+
+
 
 RESERVED = {"auth", "logout", "panel", "manage", "delete", "rename", "create", "tos",
             "static", "api", "robots.txt", "favicon.ico"}
@@ -29,6 +33,13 @@ MAX_BYTES = 256 * 1024
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_BYTES
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://",
+)
 
 
 # ---------- storage ----------
@@ -130,6 +141,7 @@ def home():
 
 
 @app.route("/create", methods=["POST"])
+@limiter.limit("10 per minute")
 def create():
     data = request.get_json(silent=True)
     if not data or not isinstance(data.get("ct"), str) or not isinstance(data.get("iv"), str):

@@ -5,15 +5,15 @@
     <main class="center">
         <div class="card">
             <div class="card-head">
-                <h1>auth</h1>
-                <a class="btn ghost" href="/">back</a>
+                <h1>Admin</h1>
+                <a class="btn ghost" href="/">Back</a>
             </div>
             <form class="card-body" method="post" action="/auth">
-                {% if error %}<div class="error">{{ error|lower }}</div>{% endif %}
-                <label class="label" for="key">access key</label>
+                {% if error %}<div class="error">{{ error }}</div>{% endif %}
+                <label class="label" for="key">Access key</label>
                 <div class="row">
                     <input name="key" type="password" id="key" autocomplete="current-password" autofocus required>
-                    <button class="primary" type="submit">enter</button>
+                    <button class="primary" type="submit">Continue</button>
                 </div>
             </form>
         </div>

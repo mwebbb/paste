@@ -6,12 +6,12 @@
         <header class="bar">
             <div class="brand">
                 <a class="name" href="/">deltabin</a>
-                <span class="crumb">panel</span>
+                <span class="crumb">Panel</span>
             </div>
             <nav class="actions">
-                <a class="btn ghost" href="/">new paste</a>
+                <a class="btn ghost" href="/">New paste</a>
                 <form action="/logout" method="post">
-                    <button class="ghost" type="submit">log out</button>
+                    <button class="ghost" type="submit">Log out</button>
                 </form>
             </nav>
         </header>
@@ -19,10 +19,10 @@
         {% if flash %}<div class="flash" id="flash">{{ flash }}</div>{% endif %}
 
         <section class="stats">
-            <div class="stat"><span class="label">pastes</span><span class="value">{{ pastes|length }}</span></div>
-            <div class="stat"><span class="label">storage</span><span class="value">{{ total|size }}</span></div>
-            <div class="stat"><span class="label">last 24h</span><span class="value" id="recent">&ndash;</span></div>
-            <div class="stat"><span class="label">newest</span><span class="value" id="newest">&ndash;</span></div>
+            <div class="stat"><span class="label">Pastes</span><span class="value">{{ pastes|length }}</span></div>
+            <div class="stat"><span class="label">Storage</span><span class="value">{{ total|size }}</span></div>
+            <div class="stat"><span class="label">Last 24h</span><span class="value" id="recent">&ndash;</span></div>
+            <div class="stat"><span class="label">Newest</span><span class="value" id="newest">&ndash;</span></div>
         </section>
 
         <form class="card" id="listForm" action="/delete" method="post">
@@ -30,9 +30,9 @@
                 <label class="check">
                     <input type="checkbox" id="selectAll">
                 </label>
-                <input id="filter" type="search" placeholder="filter" autocomplete="off" spellcheck="false">
+                <input id="filter" type="search" placeholder="Filter" autocomplete="off" spellcheck="false">
                 <span class="muted hide-sm" id="count"></span>
-                <button id="bulkDelete" class="danger" type="submit" disabled>delete</button>
+                <button id="bulkDelete" class="danger" type="submit" disabled>Delete</button>
             </div>
 
             {% if pastes %}
@@ -41,9 +41,9 @@
                     <thead>
                         <tr>
                             <th class="check-col"></th>
-                            <th><button type="button" class="sort" data-key="name">name</button></th>
-                            <th class="num"><button type="button" class="sort" data-key="size">size</button></th>
-                            <th class="num"><button type="button" class="sort active desc" data-key="ts">age</button></th>
+                            <th><button type="button" class="sort" data-key="name">Name</button></th>
+                            <th class="num"><button type="button" class="sort" data-key="size">Size</button></th>
+                            <th class="num"><button type="button" class="sort active desc" data-key="ts">Age</button></th>
                             <th></th>
                         </tr>
                     </thead>
@@ -54,15 +54,15 @@
                             <td class="name-col"><a href="{{ url_for('manage', id=p.name) }}">{{ p.name }}</a></td>
                             <td class="num">{{ p.size|size }}</td>
                             <td class="num age" title="{{ p.modified.strftime('%Y-%m-%d %H:%M UTC') }}"></td>
-                            <td class="act"><a class="btn ghost" href="{{ url_for('manage', id=p.name) }}">manage</a></td>
+                            <td class="act"><a class="btn ghost" href="{{ url_for('manage', id=p.name) }}">Manage</a></td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                <div class="empty" id="noMatch" hidden>no matches</div>
+                <div class="empty" id="noMatch" hidden>No matches</div>
             </div>
             {% else %}
-            <div class="empty">no pastes</div>
+            <div class="empty">No pastes yet</div>
             {% endif %}
         </form>
     </main>
