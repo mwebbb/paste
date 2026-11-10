@@ -1,8 +1,9 @@
-from flask import Flask, request, render_template, redirect, make_response, url_for, Response
+from flask import Flask, request, render_template, redirect, make_response, url_for, Response, jsonify
 import random
 import string
 import boto3
 import os
+import json
 from botocore.exceptions import NoCredentialsError
 from datetime import timedelta
 
@@ -67,13 +68,12 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 256 * 1024
 
 
-def create_paste(text):
-            
+def create_paste(ct, iv):
     filename = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(random.choice([3, 4])))
-
-
-    s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=text)
+    body = json.dumps({"ct": ct, "iv": iv})
+    s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=body, Metadata={"enc": "1"})
     return filename
+
 
 @app.route('/edit', methods=["GET", "POST"])
 def edit():
@@ -116,18 +116,20 @@ def edit():
 
 @app.route('/<id>')
 def paste(id):
-        
     if validate(id) == True:
         try:
             response = s3.get_object(Bucket=BUCKET_NAME, Key=id)
             content = response['Body'].read().decode('utf-8')
-            return Response(content, mimetype='text/plain')
+            if response['Metadata'].get('enc'):
+                return render_template('view.html', enc=True, payload=json.loads(content), id=id)
+            return render_template('view.html', id=id, enc=False, content=content)
         except s3.exceptions.NoSuchKey:
             return Response("404", mimetype='text/plain')
         except Exception as e:
             return f"Error: {str(e)}", 500
     else:
         return f"file {id} not found!"
+
 
 @app.route('/auth', methods=["GET", "POST"])
 def auth():
@@ -225,12 +227,12 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/submit', methods=['POST'])
-def submit():
-    text = request.form.get('text')
-    
-    return redirect(f"/{create_paste(text)}")
-    
+@app.route('/create', methods=['POST'])
+def create():
+    data = request.get_json(silent=True)
+    if not data or not isinstance(data.get("ct"), str) or not isinstance(data.get("iv"), str):
+        return Response("bad request", status=400, mimetype="text/plain")
+    return jsonify(id=create_paste(data["ct"], data["iv"]))    
 
 @app.errorhandler(413)
 def request_entity_too_large(error):

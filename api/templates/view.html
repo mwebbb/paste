@@ -1,0 +1,97 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fatal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+
+    <style>
+    body {
+        background-color: black;
+        color: white;
+        font-family: "Geist Mono";
+        padding-left: 1%;
+        text-align: left;
+        font-size: 20px;
+    }
+
+    .submit,
+    strong {
+        font-size: 15px;
+    }
+
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .button-container {
+        display: flex;
+        gap: 10px;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+</head>
+
+<body>
+    <div class="header">
+        <h4>{{ id }}</h4>
+
+        <div class="button-container" style="margin-right: 2%">
+        <button id="copyButton" type="button">copy</button>
+    </div>
+
+    </div>
+    <form>
+        <textarea placeholder="enter paste here..." type="text" id="text" name="text" required spellcheck="false" data-gramm="false" data-gramm_editor="false" readonly="true" disabled data-enable-grammarly="false">{% if not enc %}{{ content }}{% endif %}</textarea>
+    </form>
+
+    <script>
+document.getElementById("copyButton").addEventListener("click", async () => {
+    const btn = document.getElementById("copyButton");
+    try {
+        await navigator.clipboard.writeText(document.getElementById("text").value);
+        btn.textContent = "copied";
+    } catch (e) {
+        btn.textContent = "failed";
+    }
+    setTimeout(() => { btn.textContent = "copy"; }, 1500);
+});
+</script>
+
+    {% if enc %}
+    <script>
+    function unb64(s) {
+        s = s.replace(/-/g, "+").replace(/_/g, "/");
+        return Uint8Array.from(atob(s), c => c.charCodeAt(0));
+    }
+
+    async function decryptPaste(ct, iv, keyStr) {
+        const key = await crypto.subtle.importKey("raw", unb64(keyStr), "AES-GCM", false, ["decrypt"]);
+        const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(iv) }, key, unb64(ct));
+        return new TextDecoder().decode(pt);
+    }
+
+    (async () => {
+        const payload = {{ payload|tojson }};
+        const box = document.getElementById("text");
+        try {
+            box.value = await decryptPaste(payload.ct, payload.iv, location.hash.slice(1));
+        } catch (e) {
+            box.value = "could not decrypt. the link is probably missing the part after the #";
+        }
+    })();
+    </script>
+    {% endif %}</body>
+
