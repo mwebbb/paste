@@ -213,12 +213,18 @@ textarea::placeholder {
     color: var(--faint);
 }
 
-/* brighter outline, fills on hover */
+/* primary = inverted (white fill) */
 .primary {
-    border-color: var(--muted);
+    background: var(--text);
+    border-color: var(--text);
+    color: var(--bg);
 }
 
-.primary:hover,
+.primary:hover {
+    background: #fff;
+    border-color: #fff;
+}
+
 .danger:hover {
     background: var(--text);
     border-color: var(--text);
@@ -227,9 +233,9 @@ textarea::placeholder {
 
 .primary:disabled,
 .primary:disabled:hover {
-    background: var(--bg);
+    background: var(--raised);
     border-color: var(--border);
-    color: var(--faint);
+    color: var(--muted);
 }
 
 /* borderless text button */

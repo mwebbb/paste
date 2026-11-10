@@ -76,6 +76,7 @@ const pages = {
         const form = $("#pasteForm");
         const btn = $("#createButton");
         const status = $("#status");
+        let saving = false;
         editorKeys(text, form);
 
         text.addEventListener("input", () => {
@@ -83,12 +84,14 @@ const pages = {
             // base64 + json overhead: ~4/3 of the plaintext must fit in the request limit
             const over = new TextEncoder().encode(text.value).length * 4 / 3 + 200 > MAX_BYTES;
             status.textContent = !n ? "" : over ? "too large" : n + " chars";
-            btn.disabled = over;
+            btn.disabled = saving || over;
         });
 
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
-            if (!text.value) return;
+            // requestSubmit() (cmd+enter) ignores the disabled button, so guard here
+            if (saving || !text.value) return;
+            saving = true;
             btn.disabled = true;
             btn.textContent = "saving...";
             try {
@@ -106,6 +109,7 @@ const pages = {
                 location.href = "/" + id + "#" + key;
             } catch (err) {
                 status.textContent = "error: " + err.message;
+                saving = false;
                 btn.disabled = false;
                 btn.textContent = "save";
             }
