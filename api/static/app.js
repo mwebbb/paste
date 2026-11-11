@@ -29,6 +29,22 @@ async function decrypt(ct, iv, keyStr) {
     return new TextDecoder().decode(pt);
 }
 
+// what a wrong key "decrypts" to: GCM's keystream (AES-CTR) without the tag check.
+// output is random-looking bytes, different per key, same for the same key.
+async function wrongKeyDecrypt(ct, iv, keyStr) {
+    let raw;
+    try { raw = unb64(keyStr); } catch { raw = null; }
+    if (!raw || raw.length !== 32) {
+        raw = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(keyStr)));
+    }
+    const key = await crypto.subtle.importKey("raw", raw, "AES-CTR", false, ["decrypt"]);
+    const counter = new Uint8Array(16);
+    counter.set(unb64(iv));
+    counter[15] = 2; // GCM encrypts the payload starting at counter block 2
+    const body = unb64(ct).slice(0, -16);
+    return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-CTR", counter, length: 32 }, key, body));
+}
+
 function flash(btn, msg) {
     const orig = btn.dataset.label || (btn.dataset.label = btn.textContent);
     btn.textContent = msg;
@@ -148,20 +164,20 @@ const pages = {
             $("#notice").hidden = false;
         }
 
-        // without the right key, show the stored ciphertext (minus the GCM tag) as hex
-        const locked = (why) => {
-            const body = unb64(data.ct).slice(0, -16);
-            box.value = [...body].map(b => b.toString(16).padStart(2, "0")).join("");
+        const hex = (bytes) => [...bytes].map(b => b.toString(16).padStart(2, "0")).join("");
+        const lock = (why, bytes) => {
+            box.value = hex(bytes);
             box.classList.add("locked");
-            status.textContent = why + " · showing encrypted bytes";
+            status.textContent = why;
         };
 
         const keyStr = location.hash.slice(1);
-        if (!keyStr) return locked("Missing key");
+        // no key: show the stored ciphertext (minus the GCM tag) as hex
+        if (!keyStr) return lock("Missing key · showing encrypted bytes", unb64(data.ct).slice(0, -16));
         try {
             box.value = await decrypt(data.ct, data.iv, keyStr);
         } catch {
-            return locked("Wrong key");
+            return lock("Wrong key · showing what this key decrypts to", await wrongKeyDecrypt(data.ct, data.iv, keyStr));
         }
         const lines = box.value.split("\n").length;
         status.textContent = lines + (lines === 1 ? " line" : " lines") + " · " + box.value.length + " chars";
