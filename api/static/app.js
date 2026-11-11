@@ -164,14 +164,16 @@ const pages = {
             $("#notice").hidden = false;
         }
 
-        const hex = (bytes) => [...bytes].map(b => b.toString(16).padStart(2, "0")).join("");
+        // latin-1, with invisible bytes (controls, nbsp, soft hyphen) shifted into U+01xx so every byte shows
+        const latin1 = (bytes) => String.fromCharCode(...[...bytes].map(b =>
+            b < 0x20 || (b >= 0x7f && b <= 0xa0) || b === 0xad ? 0x100 + b : b));
         const lock = (bytes) => {
-            box.value = hex(bytes);
+            box.value = latin1(bytes);
             box.classList.add("locked");
         };
 
         const keyStr = location.hash.slice(1);
-        // no key: show the stored ciphertext (minus the GCM tag) as hex
+        // no key: show the stored ciphertext (minus the GCM tag)
         if (!keyStr) return lock(unb64(data.ct).slice(0, -16));
         try {
             box.value = await decrypt(data.ct, data.iv, keyStr);
