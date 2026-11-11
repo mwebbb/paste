@@ -148,18 +148,20 @@ const pages = {
             $("#notice").hidden = false;
         }
 
+        // without the right key, show the stored ciphertext (minus the GCM tag) as hex
+        const locked = (why) => {
+            const body = unb64(data.ct).slice(0, -16);
+            box.value = [...body].map(b => b.toString(16).padStart(2, "0")).join("");
+            box.classList.add("locked");
+            status.textContent = why + " · showing encrypted bytes";
+        };
+
         const keyStr = location.hash.slice(1);
-        if (!keyStr) {
-            box.placeholder = "Missing key";
-            status.textContent = "Locked";
-            return;
-        }
+        if (!keyStr) return locked("Missing key");
         try {
             box.value = await decrypt(data.ct, data.iv, keyStr);
         } catch {
-            box.placeholder = "Wrong key";
-            status.textContent = "Locked";
-            return;
+            return locked("Wrong key");
         }
         const lines = box.value.split("\n").length;
         status.textContent = lines + (lines === 1 ? " line" : " lines") + " · " + box.value.length + " chars";

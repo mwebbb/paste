@@ -406,6 +406,11 @@ textarea[readonly] {
     cursor: text;
 }
 
+textarea.locked {
+    color: var(--faint);
+    word-break: break-all;
+}
+
 /* "saved" banner on the view page */
 .notice {
     display: flex;
