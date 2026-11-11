@@ -189,7 +189,7 @@ def auth():
         return render_template("auth.html", error="incorrect key"), 401
     resp = make_response(redirect(url_for("panel")))
     resp.set_cookie("session", admin_token(), max_age=timedelta(hours=72),
-                    httponly=True, secure=request.is_secure, samesite="Strict")
+                    httponly=True, secure=True, samesite="Strict")
     return resp
 
 
