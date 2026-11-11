@@ -165,19 +165,18 @@ const pages = {
         }
 
         const hex = (bytes) => [...bytes].map(b => b.toString(16).padStart(2, "0")).join("");
-        const lock = (why, bytes) => {
+        const lock = (bytes) => {
             box.value = hex(bytes);
             box.classList.add("locked");
-            status.textContent = why;
         };
 
         const keyStr = location.hash.slice(1);
         // no key: show the stored ciphertext (minus the GCM tag) as hex
-        if (!keyStr) return lock("Missing key · showing encrypted bytes", unb64(data.ct).slice(0, -16));
+        if (!keyStr) return lock(unb64(data.ct).slice(0, -16));
         try {
             box.value = await decrypt(data.ct, data.iv, keyStr);
         } catch {
-            return lock("Wrong key · showing what this key decrypts to", await wrongKeyDecrypt(data.ct, data.iv, keyStr));
+            return lock(await wrongKeyDecrypt(data.ct, data.iv, keyStr));
         }
         const lines = box.value.split("\n").length;
         status.textContent = lines + (lines === 1 ? " line" : " lines") + " · " + box.value.length + " chars";
